@@ -1675,3 +1675,30 @@ body.modal-open {
   overflow: hidden !important;
 }
 
+
+/* ═══ Correcciones de la evaluación de casos de uso ═══ */
+.btn-clear-filters {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.btn-clear-filters:hover { border-color: var(--accent-color); color: var(--accent-color); }
+.empty-state .btn-clear-filters { margin-top: 1rem; }
+.btn-remove-item {
+  align-self: flex-end;
+  margin-top: 0.4rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #f87171;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.btn-remove-item:hover { text-decoration: underline; }
