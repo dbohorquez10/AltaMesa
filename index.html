@@ -125,6 +125,8 @@
                 <span class="checkbox-custom"></span>
                 <span class="checkbox-label">Sin Gluten</span>
               </label>
+              <!-- Corrección: botón para limpiar los filtros (secuencia de excepción del CU Consultar Menú) -->
+              <button type="button" class="btn-clear-filters hidden" id="btn-clear-filters">Limpiar filtros ✕</button>
             </div>
           </div>
         </div>
@@ -132,6 +134,7 @@
         <!-- Mensaje de no resultados (oculto por defecto) -->
         <div id="no-results-msg" class="empty-state hidden" aria-live="polite">
           <p>No se encontraron platos que coincidan con tu búsqueda.</p>
+          <button type="button" class="btn-clear-filters" id="btn-clear-filters-empty">Limpiar filtros</button>
         </div>
 
         <!-- Contenedor general del menú inyectado por JS -->

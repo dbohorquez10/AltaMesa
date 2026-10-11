@@ -223,6 +223,10 @@ function renderDishesMenu() {
     DOM.noResultsMsg.classList.add('hidden');
   }
 
+  // El botón "Limpiar filtros" solo aparece cuando hay algún filtro activo
+  const clearBtn = document.getElementById('btn-clear-filters');
+  if (clearBtn) clearBtn.classList.toggle('hidden', !hasActiveFilters());
+
   DOM.menuContainer.querySelectorAll('.btn-open-dish-modal').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const dishId = parseInt(e.currentTarget.getAttribute('data-id'), 10);
@@ -316,6 +320,32 @@ function closeCartSidebar() {
   document.body.style.overflow = '';
 }
 
+function hasActiveFilters() {
+  return AppState.searchTerm.trim() !== '' || AppState.onlyVegetarian || AppState.onlyGlutenFree ||
+    AppState.sortBy !== 'default' || AppState.activeCategory !== 'all';
+}
+
+// Corrección CU Consultar Menú: restablece búsqueda, categoría, dieta y orden
+function clearMenuFilters() {
+  AppState.searchTerm = '';
+  AppState.onlyVegetarian = false;
+  AppState.onlyGlutenFree = false;
+  AppState.sortBy = 'default';
+  AppState.activeCategory = 'all';
+  if (DOM.menuSearchInput) DOM.menuSearchInput.value = '';
+  if (DOM.filterVegCheckbox) DOM.filterVegCheckbox.checked = false;
+  if (DOM.filterGlutenCheckbox) DOM.filterGlutenCheckbox.checked = false;
+  if (DOM.sortSelect) DOM.sortSelect.value = 'default';
+  DOM.filterButtons().forEach(b => b.classList.toggle('active', b.getAttribute('data-category') === 'all'));
+  renderDishesMenu();
+}
+
+// Corrección CU Gestionar Carrito: quitar un plato completo del pedido
+function removeCartItem(uniqueKey) {
+  AppState.cart = AppState.cart.filter(item => item.uniqueKey !== uniqueKey);
+  saveCartToStorage();
+}
+
 function updateItemQuantity(uniqueKey, delta) {
   const itemIndex = AppState.cart.findIndex(item => item.uniqueKey === uniqueKey);
   if (itemIndex === -1) return;
@@ -371,12 +401,14 @@ function updateCartUI() {
         </div>
         <div class="cart-item-price-subtotal">${currencyFormatter.format(itemSubtotal)}</div>
       </div>
+      <button type="button" class="btn-remove-item" data-key="${item.uniqueKey}" aria-label="Eliminar ${item.name} del pedido">Eliminar</button>
     `;
     fragment.appendChild(itemElement);
   });
   DOM.cartItemsContainer.appendChild(fragment);
 
   DOM.cartItemsContainer.querySelectorAll('.btn-decrease').forEach(btn => btn.addEventListener('click', (e) => updateItemQuantity(e.currentTarget.getAttribute('data-key'), -1)));
+  DOM.cartItemsContainer.querySelectorAll('.btn-remove-item').forEach(btn => btn.addEventListener('click', (e) => removeCartItem(e.currentTarget.getAttribute('data-key'))));
   DOM.cartItemsContainer.querySelectorAll('.btn-increase').forEach(btn => btn.addEventListener('click', (e) => updateItemQuantity(e.currentTarget.getAttribute('data-key'), 1)));
 
   DOM.cartSubtotalPrice.textContent = currencyFormatter.format(subtotal);
@@ -550,6 +582,9 @@ function initializeApp() {
       renderDishesMenu();
     });
   });
+
+  document.getElementById('btn-clear-filters').addEventListener('click', clearMenuFilters);
+  document.getElementById('btn-clear-filters-empty').addEventListener('click', clearMenuFilters);
 
   renderDishesMenu();
 
