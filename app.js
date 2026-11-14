@@ -1,19 +1,32 @@
 /**
  * @file app.js
  * @description Lógica interactiva para la Landing Page de AltaMesa Restaurant.
+ * Integrada 100% con Bootstrap 5.3.3 (Modals, Offcanvas, Toasts, Tooltips)
+ * y enriquecida con microinteracciones táctiles, animaciones y respuestas visuales instantáneas.
+ * 
+ * Cada microinteracción está documentada con su propósito de UX, evento disparador y efecto visual.
  */
+
+// =============================================================================
+// 1. CONSTANTES, CATÁLOGO Y CONFIGURACIÓN INICIAL
+// =============================================================================
 
 const STORAGE_KEYS = {
   CART: 'altamesa_cart_items',
   RESERVATIONS: 'altamesa_reservations'
 };
 
+/** Formateador de moneda colombiana (COP) */
 const currencyFormatter = new Intl.NumberFormat('es-CO', {
   style: 'currency',
   currency: 'COP',
   maximumFractionDigits: 0
 });
 
+/** Meta VIP en el carrito para desbloquear beneficio gourmet de cortesía */
+const VIP_REWARD_GOAL = 120000;
+
+/** Catálogo de creaciones culinarias */
 const DISHES_CATALOG = [
   { id: 1, name: "Carpaccio de Res con Trufa Blanca", description: "Finas láminas de lomo curado, alcaparras baby, queso Parmigiano madurado y un toque de aceite de trufa blanca.", price: 48000, isVegetarian: false, isGlutenFree: true, category: "Entradas", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=700&q=80", customizations: ["Sin alcaparras", "Sin queso", "Extra aceite de trufa"] },
   { id: 2, name: "Ostras Gratinadas al Champán", description: "Ostras frescas del pacífico horneadas con una suave crema de champán, espinacas tiernas y gratinado de queso gruyère.", price: 65000, isVegetarian: false, isGlutenFree: true, category: "Entradas", image: "https://images.unsplash.com/photo-1506354666786-959d6d497f1a?auto=format&fit=crop&w=700&q=80", customizations: ["Sin espinacas", "Poco gratinado"] },
@@ -33,6 +46,7 @@ const DISHES_CATALOG = [
   { id: 16, name: "Volcán de Dulce de Leche", description: "Soufflé horneado al momento con corazón fundido de dulce de leche artesanal, acompañado de helado de vainilla en vaina.", price: 34000, isVegetarian: true, isGlutenFree: false, category: "Postres", image: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=700&q=80", customizations: ["Sin helado", "Helado aparte"] }
 ];
 
+/** Estado Reactivo de la Aplicación */
 const AppState = {
   cart: [],
   pendingDish: null,
@@ -40,22 +54,35 @@ const AppState = {
   onlyVegetarian: false,
   onlyGlutenFree: false,
   sortBy: 'default',
-  activeCategory: 'all'
+  activeCategory: 'all',
+  
+  // Instancias Bootstrap 5 API
+  bsCartOffcanvas: null,
+  bsDishModal: null,
+  bsCheckoutModal: null
 };
+
+// =============================================================================
+// 2. REFERENCIAS AL DOM
+// =============================================================================
 
 const DOM = {
   navbar: document.getElementById('navbar'),
   cartToggleBtn: document.getElementById('cart-toggle-btn'),
   cartCountBadge: document.getElementById('cart-count'),
   currentYearSpan: document.getElementById('current-year'),
+  btnScrollTop: document.getElementById('btn-scroll-top'),
 
   menuContainer: document.getElementById('menu-container'),
   menuSearchInput: document.getElementById('menu-search-input'),
+  btnClearSearch: document.getElementById('btn-clear-search'),
   filterVegCheckbox: document.getElementById('filter-vegetarian-checkbox'),
   filterGlutenCheckbox: document.getElementById('filter-gluten-checkbox'),
   sortSelect: document.getElementById('sort-select'),
   filterButtons: () => document.querySelectorAll('.filter-btn'),
   noResultsMsg: document.getElementById('no-results-msg'),
+  btnResetFilters: document.getElementById('btn-reset-filters'),
+  resultsCountBadge: document.getElementById('results-count-badge'),
 
   dishModal: document.getElementById('dish-customization-dialog'),
   dishModalTitle: document.getElementById('modal-dish-title'),
@@ -67,11 +94,13 @@ const DOM = {
   dishExclusionCheckboxes: () => document.querySelectorAll('input[name="dish-exclusion"]'),
 
   cartSidebar: document.getElementById('cart-sidebar'),
-  cartOverlay: document.getElementById('cart-overlay'),
   cartCloseBtn: document.getElementById('cart-close-btn'),
   cartItemsContainer: document.getElementById('cart-items-container'),
   cartSubtotalPrice: document.getElementById('cart-subtotal-price'),
   btnProceedCheckout: document.getElementById('btn-proceed-checkout'),
+  cartRewardProgressBar: document.getElementById('cart-reward-progress-bar'),
+  cartRewardText: document.getElementById('cart-reward-text'),
+  cartRewardStatus: document.getElementById('cart-reward-status'),
 
   checkoutModal: document.getElementById('checkout-modal'),
   checkoutContent: document.getElementById('checkout-dialog-content'),
@@ -85,18 +114,24 @@ const DOM = {
   },
   payCashRadio: document.getElementById('pay-cash'),
   payCardRadio: document.getElementById('pay-card'),
+  payCashLabel: document.getElementById('pay-cash-label'),
+  payCardLabel: document.getElementById('pay-card-label'),
   cardFields: document.getElementById('card-fields'),
   cashNote: document.getElementById('cash-note'),
   cardNumber: document.getElementById('checkout-card-number'),
   cardExpiry: document.getElementById('checkout-card-expiry'),
   cardCvv: document.getElementById('checkout-card-cvv'),
   cardHolder: document.getElementById('checkout-card-holder'),
+  cardBrandBadge: document.getElementById('card-brand-badge'),
   btnConfirmCheckout: document.getElementById('btn-confirm-checkout'),
+  btnCheckoutLabel: document.getElementById('btn-checkout-label'),
 
   reservationForm: document.getElementById('reservation-form'),
   reservationSuccessContainer: document.getElementById('reservation-success-container'),
   reservationDetails: document.getElementById('reservation-details'),
   btnNewReservation: document.getElementById('btn-new-reservation'),
+  reservationPreviewBox: document.getElementById('reservation-preview-box'),
+  reservationPreviewText: document.getElementById('reservation-preview-text'),
   resInputs: {
     name: document.getElementById('res-name'),
     guests: document.getElementById('res-guests'),
@@ -109,17 +144,206 @@ const DOM = {
     guests: document.getElementById('res-guests-error'),
     date: document.getElementById('res-date-error'),
     time: document.getElementById('res-time-error')
-  }
+  },
+
+  toastContainer: document.getElementById('altamesa-toast-container'),
+  scheduleCard: document.getElementById('schedule-card'),
+  businessStatusBadge: document.getElementById('business-status-badge')
 };
+
+// =============================================================================
+// 3. SISTEMA DE MICROINTERACCIONES CORE
+// =============================================================================
+
+/**
+ * MICROINTERACCIÓN 1: Efecto Onda Ripple en Botones
+ * Qué hace: Genera un círculo de luz que se expande radialmente desde el punto exacto
+ * donde el usuario hizo clic o pulsó con el dedo, dando respuesta visual táctil.
+ */
+function initRippleEffect() {
+  document.addEventListener('click', (e) => {
+    const targetBtn = e.target.closest('.ripple-btn, .btn');
+    if (!targetBtn) return;
+
+    const rect = targetBtn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    const wave = document.createElement('span');
+    wave.className = 'ripple-wave';
+    wave.style.width = wave.style.height = `${size}px`;
+    wave.style.left = `${x}px`;
+    wave.style.top = `${y}px`;
+
+    targetBtn.appendChild(wave);
+    setTimeout(() => wave.remove(), 650);
+  });
+}
+
+/**
+ * MICROINTERACCIÓN 2: Partícula Flotante "+1" Dorada
+ * Qué hace: Al presionar "Añadir" en una tarjeta, lanza un elemento flotante "+1"
+ * que se eleva y desvanece, conectando el producto directamente con el acto de compra.
+ */
+function triggerFloatingParticle(originElement) {
+  if (!originElement) return;
+  const rect = originElement.getBoundingClientRect();
+  const particle = document.createElement('div');
+  particle.className = 'floating-item-particle';
+  particle.textContent = '+1';
+  particle.style.left = `${rect.left + rect.width / 2 - 10}px`;
+  particle.style.top = `${rect.top - 10}px`;
+
+  document.body.appendChild(particle);
+  setTimeout(() => particle.remove(), 900);
+}
+
+/**
+ * MICROINTERACCIÓN 3: Notificación Flotante con Bootstrap 5 Toast
+ * Qué hace: Despliega una alerta no intrusiva en la esquina inferior con icono temático,
+ * confirmando al usuario la acción realizada (ej: "Plato añadido", "Reserva lista").
+ */
+function showToast(title, message, iconClass = 'bi-check-circle-fill text-gold') {
+  if (!DOM.toastContainer) return;
+
+  const toastId = `toast-${Date.now()}`;
+  const toastEl = document.createElement('div');
+  toastEl.className = 'toast custom-toast align-items-center border-0';
+  toastEl.id = toastId;
+  toastEl.setAttribute('role', 'alert');
+  toastEl.setAttribute('aria-live', 'assertive');
+  toastEl.setAttribute('aria-atomic', 'true');
+
+  toastEl.innerHTML = `
+    <div class="d-flex align-items-center">
+      <div class="toast-body d-flex align-items-center gap-2 py-3 px-3">
+        <i class="bi ${iconClass} fs-4 flex-shrink-0"></i>
+        <div>
+          <div class="fw-bold text-white small">${title}</div>
+          <div class="text-light small opacity-75">${message}</div>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  `;
+
+  DOM.toastContainer.appendChild(toastEl);
+  if (window.bootstrap && bootstrap.Toast) {
+    const bsToast = new bootstrap.Toast(toastEl, { delay: 3500 });
+    bsToast.show();
+    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+  } else {
+    setTimeout(() => toastEl.remove(), 3500);
+  }
+}
+
+/**
+ * MICROINTERACCIÓN 4: Botón Flotante "Volver Arriba" Scroll-Driven
+ * Qué hace: Monitorea el desplazamiento vertical. Al superar 350px aparece con elevación
+ * y brillo suave; al hacer clic, desplaza la ventana con suavidad cinematográfica.
+ */
+function initScrollTopButton() {
+  if (!DOM.btnScrollTop) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 350) {
+      DOM.btnScrollTop.classList.add('visible');
+    } else {
+      DOM.btnScrollTop.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  DOM.btnScrollTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/**
+ * MICROINTERACCIÓN 5: Transición Glassmorphic de la Barra de Navegación
+ * Qué hace: Al desplazarse hacia abajo, contrae sutilmente la altura del navbar,
+ * aumenta el desenfoque de fondo y proyecta un borde inferior dorado sutil.
+ */
+function initNavbarScrollEffect() {
+  const handleScroll = () => {
+    if (window.scrollY > 40) {
+      DOM.navbar.classList.add('scrolled');
+    } else {
+      DOM.navbar.classList.remove('scrolled');
+    }
+  };
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+}
+
+/**
+ * MICROINTERACCIÓN 6: Detección y Resaltado del Horario Actual
+ * Qué hace: Comprueba el día actual de la semana (0: Domingo, 1: Lunes, etc.)
+ * y resalta automáticamente en la tarjeta de contacto la fila correspondiente con borde dorado.
+ */
+function highlightCurrentScheduleDay() {
+  const currentDay = new Date().getDay(); // 0 a 6
+  const scheduleRows = document.querySelectorAll('.schedule-list li');
+  scheduleRows.forEach(row => {
+    const daysAttr = row.getAttribute('data-days');
+    if (!daysAttr) return;
+    const days = daysAttr.split(',').map(d => parseInt(d.trim(), 10));
+    if (days.includes(currentDay)) {
+      row.classList.add('schedule-today-active');
+      const badge = document.createElement('span');
+      badge.className = 'badge bg-gold text-dark ms-2 small fw-bold';
+      badge.textContent = 'Hoy';
+      row.querySelector('span:first-child').appendChild(badge);
+    }
+  });
+
+  // Si hoy es lunes (cerrado)
+  if (currentDay === 1 && DOM.businessStatusBadge) {
+    DOM.businessStatusBadge.className = 'badge rounded-pill bg-danger-subtle text-danger border border-danger px-2 py-1 small';
+    DOM.businessStatusBadge.innerHTML = '<span class="status-pulse-dot" style="background-color:#ef4444; box-shadow:0 0 8px #ef4444;"></span> Cerrado Hoy';
+  }
+}
+
+/**
+ * MICROINTERACCIÓN: Sistema de Desenfoque y Nublado para Subventanas & Carrito
+ * Qué hace: Detecta la apertura del carrito (offcanvas) y de cualquier ventana modal
+ * (personalización de plato, checkout de pago), aplicando la clase 'subwindow-active'
+ * para coordinar el desenfoque óptico cinematográfico y oscurecimiento del fondo.
+ */
+function initSubwindowBlurSystem() {
+  const elements = [DOM.cartSidebar, DOM.dishModal, DOM.checkoutModal].filter(Boolean);
+
+  elements.forEach(element => {
+    element.addEventListener('show.bs.offcanvas', () => {
+      document.body.classList.add('subwindow-active');
+    });
+    element.addEventListener('show.bs.modal', () => {
+      document.body.classList.add('subwindow-active');
+    });
+
+    element.addEventListener('hidden.bs.offcanvas', () => {
+      const hasOtherOpen = document.querySelector('.modal.show, .offcanvas.show');
+      if (!hasOtherOpen) {
+        document.body.classList.remove('subwindow-active');
+      }
+    });
+    element.addEventListener('hidden.bs.modal', () => {
+      const hasOtherOpen = document.querySelector('.modal.show, .offcanvas.show');
+      if (!hasOtherOpen) {
+        document.body.classList.remove('subwindow-active');
+      }
+    });
+  });
+}
+
+// =============================================================================
+// 4. GESTIÓN DEL CARRITO (BOOTSTRAP 5 OFFCANVAS & REWARD PROGRESS)
+// =============================================================================
 
 function loadCartFromStorage() {
   try {
     const serializedCart = localStorage.getItem(STORAGE_KEYS.CART);
-    if (serializedCart) {
-      AppState.cart = JSON.parse(serializedCart);
-    } else {
-      AppState.cart = [];
-    }
+    AppState.cart = serializedCart ? JSON.parse(serializedCart) : [];
   } catch (error) {
     AppState.cart = [];
   }
@@ -131,29 +355,193 @@ function saveCartToStorage() {
   updateCartUI();
 }
 
-function saveReservationToStorage(reservationData) {
-  const existing = JSON.parse(localStorage.getItem(STORAGE_KEYS.RESERVATIONS) || '[]');
-  existing.push(reservationData);
-  localStorage.setItem(STORAGE_KEYS.RESERVATIONS, JSON.stringify(existing));
+/**
+ * MICROINTERACCIÓN 7: Rebote Elástico en el Contador Badge del Carrito
+ * Qué hace: Aplica una animación CSS con overshoot (curva spring) cada vez que
+ * la cantidad total de platos cambia, llamando la atención hacia el carrito.
+ */
+function triggerCartBadgeAnimation() {
+  DOM.cartCountBadge.classList.remove('badge-bounce-animation');
+  void DOM.cartCountBadge.offsetWidth; // Forzar reflow para reiniciar animación
+  DOM.cartCountBadge.classList.add('badge-bounce-animation');
 }
 
-function initNavbarScrollEffect() {
-  const handleScroll = () => {
-    if (window.scrollY > 50) {
-      DOM.navbar.classList.add('scrolled');
-    } else {
-      DOM.navbar.classList.remove('scrolled');
-    }
-  };
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  handleScroll();
+/**
+ * MICROINTERACCIÓN 8: Barra de Progreso a Beneficio Gourmet en el Carrito
+ * Qué hace: Muestra cuánto le falta al usuario para recibir un obsequio VIP del Chef
+ * ($120.000 COP) y anima dinámicamente la barra de progreso a rayas doradas.
+ */
+function updateRewardProgress(subtotal) {
+  if (!DOM.cartRewardProgressBar || !DOM.cartRewardStatus) return;
+
+  const percentage = Math.min(100, Math.round((subtotal / VIP_REWARD_GOAL) * 100));
+  DOM.cartRewardProgressBar.style.width = `${percentage}%`;
+  DOM.cartRewardProgressBar.setAttribute('aria-valuenow', percentage);
+
+  if (subtotal >= VIP_REWARD_GOAL) {
+    DOM.cartRewardProgressBar.classList.remove('bg-gold');
+    DOM.cartRewardProgressBar.classList.add('bg-success');
+    DOM.cartRewardStatus.textContent = '¡DESBLOQUEADO!';
+    DOM.cartRewardStatus.className = 'text-success fw-bold';
+    DOM.cartRewardText.innerHTML = '<i class="bi bi-gift-fill text-success me-1"></i> ¡Obsequio Gourmet Desbloqueado! 🍾';
+  } else {
+    const remaining = VIP_REWARD_GOAL - subtotal;
+    DOM.cartRewardProgressBar.classList.remove('bg-success');
+    DOM.cartRewardProgressBar.classList.add('bg-gold');
+    DOM.cartRewardStatus.textContent = currencyFormatter.format(remaining);
+    DOM.cartRewardStatus.className = 'text-gold fw-bold';
+    DOM.cartRewardText.innerHTML = '<i class="bi bi-gift-fill text-gold me-1"></i> Faltan para Obsequio VIP:';
+  }
 }
+
+function updateCartUI() {
+  const totalItems = AppState.cart.reduce((sum, item) => sum + item.quantity, 0);
+  DOM.cartCountBadge.textContent = totalItems.toString();
+  triggerCartBadgeAnimation();
+
+  DOM.cartItemsContainer.innerHTML = '';
+
+  if (AppState.cart.length === 0) {
+    DOM.cartItemsContainer.innerHTML = `
+      <div class="cart-empty-message text-center my-auto py-5 text-muted">
+        <i class="bi bi-bag-x display-3 text-gold opacity-50 mb-3 d-block"></i>
+        <h5 class="text-white font-serif mb-1">Tu pedido está vacío</h5>
+        <p class="small text-muted mb-3">Agrega tus creaciones favoritas desde la carta</p>
+        <a href="#menu" class="btn btn-outline-gold btn-sm ripple-btn" data-bs-dismiss="offcanvas">
+          Explorar la Carta
+        </a>
+      </div>`;
+    DOM.cartSubtotalPrice.textContent = currencyFormatter.format(0);
+    DOM.btnProceedCheckout.disabled = true;
+    updateRewardProgress(0);
+    return;
+  }
+
+  let subtotal = 0;
+  const fragment = document.createDocumentFragment();
+
+  AppState.cart.forEach(item => {
+    const itemSubtotal = item.price * item.quantity;
+    subtotal += itemSubtotal;
+
+    const itemElement = document.createElement('div');
+    itemElement.className = 'cart-item';
+    itemElement.setAttribute('data-key', item.uniqueKey);
+
+    const exclusionsHTML = item.exclusions.length > 0 
+      ? `<div class="cart-item-exclusions"><i class="bi bi-info-circle me-1"></i>${item.exclusions.join(', ')}</div>` 
+      : '';
+
+    itemElement.innerHTML = `
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="pe-2">
+          <h5 class="cart-item-name font-serif">${item.name}</h5>
+          ${exclusionsHTML}
+        </div>
+        <button type="button" class="btn-remove-item btn p-0 text-muted hover-danger" data-key="${item.uniqueKey}" title="Eliminar plato" aria-label="Eliminar ${item.name}">
+          <i class="bi bi-trash3 fs-6"></i>
+        </button>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-dark-subtle">
+        <!-- Control Táctil de Cantidades con Rebote -->
+        <div class="quantity-control">
+          <button type="button" class="btn-qty btn-decrease" data-key="${item.uniqueKey}" aria-label="Restar una unidad">-</button>
+          <span class="item-qty-value">${item.quantity}</span>
+          <button type="button" class="btn-qty btn-increase" data-key="${item.uniqueKey}" aria-label="Añadir una unidad">+</button>
+        </div>
+        <div class="cart-item-price-subtotal">${currencyFormatter.format(itemSubtotal)}</div>
+      </div>
+    `;
+    fragment.appendChild(itemElement);
+  });
+
+  DOM.cartItemsContainer.appendChild(fragment);
+
+  // Listeners de control de cantidades
+  DOM.cartItemsContainer.querySelectorAll('.btn-decrease').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const key = e.currentTarget.getAttribute('data-key');
+      updateItemQuantity(key, -1);
+    });
+  });
+
+  DOM.cartItemsContainer.querySelectorAll('.btn-increase').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const key = e.currentTarget.getAttribute('data-key');
+      updateItemQuantity(key, 1);
+    });
+  });
+
+  // Listener para botón de eliminación directa con microanimación de desvanecimiento
+  DOM.cartItemsContainer.querySelectorAll('.btn-remove-item').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const key = e.currentTarget.getAttribute('data-key');
+      animateAndRemoveItem(key);
+    });
+  });
+
+  DOM.cartSubtotalPrice.textContent = currencyFormatter.format(subtotal);
+  DOM.btnProceedCheckout.disabled = false;
+  updateRewardProgress(subtotal);
+}
+
+/**
+ * MICROINTERACCIÓN 9: Deslizamiento y Colapso al Eliminar Ítem del Carrito
+ * Qué hace: Desplaza el ítem suavemente hacia la derecha con reducción de altura a cero
+ * antes de retirarlo del almacenamiento, ofreciendo una transición fluida sin saltos abruptos.
+ */
+function animateAndRemoveItem(uniqueKey) {
+  const itemEl = DOM.cartItemsContainer.querySelector(`[data-key="${uniqueKey}"]`);
+  if (itemEl) {
+    itemEl.classList.add('removing');
+    setTimeout(() => {
+      const itemIndex = AppState.cart.findIndex(i => i.uniqueKey === uniqueKey);
+      if (itemIndex > -1) {
+        AppState.cart.splice(itemIndex, 1);
+        saveCartToStorage();
+        showToast('Plato removido', 'Se ha retirado del pedido', 'bi-trash text-warning');
+      }
+    }, 320);
+  } else {
+    updateItemQuantity(uniqueKey, -9999);
+  }
+}
+
+function updateItemQuantity(uniqueKey, delta) {
+  const itemIndex = AppState.cart.findIndex(item => item.uniqueKey === uniqueKey);
+  if (itemIndex === -1) return;
+
+  if (AppState.cart[itemIndex].quantity + delta <= 0) {
+    animateAndRemoveItem(uniqueKey);
+    return;
+  }
+
+  AppState.cart[itemIndex].quantity += delta;
+  saveCartToStorage();
+}
+
+function openCartSidebar() {
+  if (AppState.bsCartOffcanvas) {
+    AppState.bsCartOffcanvas.show();
+  }
+}
+
+function closeCartSidebar() {
+  if (AppState.bsCartOffcanvas) {
+    AppState.bsCartOffcanvas.hide();
+  }
+}
+
+// =============================================================================
+// 5. CONSULTAR MENÚ Y FILTROS INTERACTIVOS
+// =============================================================================
 
 function renderDishesMenu() {
   if (!DOM.menuContainer) return;
   DOM.menuContainer.innerHTML = '';
   
-  let hasResults = false;
+  let totalMatches = 0;
   const categories = ['Entradas', 'Fuertes', 'Postres'];
   const categoriesToRender = AppState.activeCategory === 'all' ? categories : [AppState.activeCategory];
 
@@ -176,60 +564,79 @@ function renderDishesMenu() {
     });
 
     if (filteredDishes.length > 0) {
-      hasResults = true;
+      totalMatches += filteredDishes.length;
 
+      // Título de la Categoría con Línea de Acento Dorada
       const catHeader = document.createElement('h3');
       catHeader.className = 'menu-category-title';
       catHeader.textContent = cat === 'Fuertes' ? 'Platos Fuertes' : cat;
       DOM.menuContainer.appendChild(catHeader);
 
-      const grid = document.createElement('div');
-      grid.className = 'dishes-grid';
+      // Grid Bootstrap con Row y Col
+      const gridRow = document.createElement('div');
+      gridRow.className = 'row g-4';
 
       filteredDishes.forEach(dish => {
-        const card = document.createElement('article');
-        card.className = 'dish-card';
-        card.setAttribute('data-id', dish.id.toString());
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-12 col-md-6 col-lg-4 col-xl-3';
 
-        const vegBadge = dish.isVegetarian ? `<span class="dish-badge-veg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M12 22c4.97-4.97 8-9.4 8-14a8 8 0 1 0-16 0c0 4.6 3.03 9.03 8 14z"></path><path d="M12 22V12"></path></svg>Veg</span>` : '';
-        const gfBadge = dish.isGlutenFree ? `<span class="dish-badge-veg" style="top: 3rem; background: rgba(212,175,55,0.9);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>Sin Gluten</span>` : '';
+        const vegBadge = dish.isVegetarian 
+          ? `<span class="dish-badge-veg" title="Apto para vegetarianos"><i class="bi bi-leaf-fill me-1"></i>Veg</span>` 
+          : '';
+        const gfBadge = dish.isGlutenFree 
+          ? `<span class="dish-badge-gf" title="Sin gluten certificado"><i class="bi bi-shield-check me-1"></i>Sin Gluten</span>` 
+          : '';
 
-        card.innerHTML = `
-          <div class="dish-image-wrapper">
-            <img src="${dish.image}" alt="${dish.name}" class="dish-img" loading="lazy">
-            ${vegBadge}
-            ${gfBadge}
-          </div>
-          <div class="dish-body">
-            <h3 class="dish-title">${dish.name}</h3>
-            <p class="dish-desc">${dish.description}</p>
-            <div class="dish-footer">
-              <span class="dish-price">${currencyFormatter.format(dish.price)}</span>
-              <button type="button" class="btn btn-secondary btn-sm btn-open-dish-modal" data-id="${dish.id}">
-                Añadir
-              </button>
+        colDiv.innerHTML = `
+          <article class="dish-card h-100" data-id="${dish.id}">
+            <div class="dish-image-wrapper">
+              <img src="${dish.image}" alt="${dish.name}" class="dish-img" loading="lazy">
+              ${vegBadge}
+              ${gfBadge}
             </div>
-          </div>
+            <div class="dish-body">
+              <h4 class="dish-title">${dish.name}</h4>
+              <p class="dish-desc">${dish.description}</p>
+              <div class="dish-footer">
+                <span class="dish-price">${currencyFormatter.format(dish.price)}</span>
+                <button type="button" class="btn btn-open-dish-modal ripple-btn" data-id="${dish.id}" aria-label="Personalizar y añadir ${dish.name}">
+                  <i class="bi bi-plus-lg me-1"></i> Añadir
+                </button>
+              </div>
+            </div>
+          </article>
         `;
-        grid.appendChild(card);
+        gridRow.appendChild(colDiv);
       });
-      DOM.menuContainer.appendChild(grid);
+
+      DOM.menuContainer.appendChild(gridRow);
     }
   });
 
-  if (!hasResults) {
-    DOM.noResultsMsg.classList.remove('hidden');
+  // Actualización del Estado Vacío y Contador Live
+  if (totalMatches === 0) {
+    DOM.noResultsMsg.classList.remove('d-none');
+    if (DOM.resultsCountBadge) DOM.resultsCountBadge.textContent = '0 creaciones encontradas';
   } else {
-    DOM.noResultsMsg.classList.add('hidden');
+    DOM.noResultsMsg.classList.add('d-none');
+    if (DOM.resultsCountBadge) {
+      DOM.resultsCountBadge.textContent = `${totalMatches} ${totalMatches === 1 ? 'creación disponible' : 'creaciones disponibles'}`;
+    }
   }
 
+  // Asignar listeners a los botones "Añadir"
   DOM.menuContainer.querySelectorAll('.btn-open-dish-modal').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const dishId = parseInt(e.currentTarget.getAttribute('data-id'), 10);
+      triggerFloatingParticle(e.currentTarget);
       openDishCustomizationModal(dishId);
     });
   });
 }
+
+// =============================================================================
+// 6. MODAL DE PERSONALIZACIÓN DE PLATO (BOOTSTRAP 5 MODAL)
+// =============================================================================
 
 function openDishCustomizationModal(dishId) {
   const dish = DISHES_CATALOG.find(d => d.id === dishId);
@@ -241,31 +648,41 @@ function openDishCustomizationModal(dishId) {
   DOM.dishModalPrice.textContent = currencyFormatter.format(dish.price);
 
   DOM.modalExclusionsList.innerHTML = '';
-  dish.customizations.forEach(cust => {
-    DOM.modalExclusionsList.innerHTML += `
-      <label class="custom-checkbox-container">
-        <input type="checkbox" name="dish-exclusion" value="${cust}">
-        <span class="checkbox-custom"></span>
-        <span class="checkbox-label">${cust}</span>
-      </label>
+  
+  dish.customizations.forEach((cust, idx) => {
+    const label = document.createElement('label');
+    label.className = 'custom-checkbox-container';
+    label.innerHTML = `
+      <input type="checkbox" name="dish-exclusion" value="${cust}" id="cust-${dish.id}-${idx}">
+      <span class="checkbox-custom"></span>
+      <span class="text-light small fw-medium">${cust}</span>
     `;
+
+    /**
+     * MICROINTERACCIÓN 10: Checkbox Spring Bounce con Highlight Activo
+     * Qué hace: Al marcar o desmarcar una preferencia culinaria, aplica la clase .checked
+     * que resalta la fila completa en oro sutil y activa el resorte en el checkmark.
+     */
+    label.querySelector('input').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        label.classList.add('checked');
+      } else {
+        label.classList.remove('checked');
+      }
+    });
+
+    DOM.modalExclusionsList.appendChild(label);
   });
 
-  if (typeof DOM.dishModal.showModal === 'function') {
-    DOM.dishModal.showModal();
-  } else {
-    DOM.dishModal.setAttribute('open', 'true');
+  if (AppState.bsDishModal) {
+    AppState.bsDishModal.show();
   }
-  document.body.classList.add('modal-open');
 }
 
 function closeDishCustomizationModal() {
-  if (typeof DOM.dishModal.close === 'function') {
-    DOM.dishModal.close();
-  } else {
-    DOM.dishModal.removeAttribute('open');
+  if (AppState.bsDishModal) {
+    AppState.bsDishModal.hide();
   }
-  document.body.classList.remove('modal-open');
   AppState.pendingDish = null;
 }
 
@@ -295,130 +712,94 @@ function handleConfirmAddToCart() {
     });
   }
 
+  const addedDishName = AppState.pendingDish.name;
   saveCartToStorage();
   closeDishCustomizationModal();
-  openCartSidebar();
+  
+  // Feedback inmediato al usuario
+  showToast('¡Añadido al pedido!', `${addedDishName} se encuentra en tu carrito`, 'bi-bag-plus-fill text-gold');
+  
+  // Abrir suavemente el offcanvas del carrito para confirmar
+  setTimeout(() => openCartSidebar(), 300);
 }
 
-function openCartSidebar() {
-  DOM.cartSidebar.classList.add('open');
-  DOM.cartSidebar.setAttribute('aria-hidden', 'false');
-  DOM.cartOverlay.classList.add('active');
-  DOM.cartOverlay.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeCartSidebar() {
-  DOM.cartSidebar.classList.remove('open');
-  DOM.cartSidebar.setAttribute('aria-hidden', 'true');
-  DOM.cartOverlay.classList.remove('active');
-  DOM.cartOverlay.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
-}
-
-function updateItemQuantity(uniqueKey, delta) {
-  const itemIndex = AppState.cart.findIndex(item => item.uniqueKey === uniqueKey);
-  if (itemIndex === -1) return;
-  AppState.cart[itemIndex].quantity += delta;
-  if (AppState.cart[itemIndex].quantity <= 0) {
-    AppState.cart.splice(itemIndex, 1);
-  }
-  saveCartToStorage();
-}
-
-function updateCartUI() {
-  const totalItems = AppState.cart.reduce((sum, item) => sum + item.quantity, 0);
-  DOM.cartCountBadge.textContent = totalItems.toString();
-  DOM.cartCountBadge.style.transform = 'scale(1.25)';
-  setTimeout(() => { DOM.cartCountBadge.style.transform = 'scale(1)'; }, 150);
-
-  DOM.cartItemsContainer.innerHTML = '';
-
-  if (AppState.cart.length === 0) {
-    DOM.cartItemsContainer.innerHTML = `
-      <div class="cart-empty-message" style="text-align: center; margin: auto 0; color: #9ca3af;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.5; margin-bottom:1rem;"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-        <p>Tu carrito está vacío</p>
-        <span style="font-size: 0.85rem;">Agrega deliciosos platos de nuestra carta</span>
-      </div>`;
-    DOM.cartSubtotalPrice.textContent = currencyFormatter.format(0);
-    DOM.btnProceedCheckout.disabled = true;
-    return;
-  }
-
-  let subtotal = 0;
-  const fragment = document.createDocumentFragment();
-
-  AppState.cart.forEach(item => {
-    const itemSubtotal = item.price * item.quantity;
-    subtotal += itemSubtotal;
-    const itemElement = document.createElement('div');
-    itemElement.className = 'cart-item';
-    const exclusionsHTML = item.exclusions.length > 0 ? `<div class="cart-item-exclusions">Nota: ${item.exclusions.join(', ')}</div>` : '';
-
-    itemElement.innerHTML = `
-      <div class="cart-item-header">
-        <div>
-          <h4 class="cart-item-name">${item.name}</h4>
-          ${exclusionsHTML}
-        </div>
-      </div>
-      <div class="cart-item-actions">
-        <div class="quantity-control">
-          <button type="button" class="btn-qty btn-decrease" data-key="${item.uniqueKey}">-</button>
-          <span class="item-qty-value">${item.quantity}</span>
-          <button type="button" class="btn-qty btn-increase" data-key="${item.uniqueKey}">+</button>
-        </div>
-        <div class="cart-item-price-subtotal">${currencyFormatter.format(itemSubtotal)}</div>
-      </div>
-    `;
-    fragment.appendChild(itemElement);
-  });
-  DOM.cartItemsContainer.appendChild(fragment);
-
-  DOM.cartItemsContainer.querySelectorAll('.btn-decrease').forEach(btn => btn.addEventListener('click', (e) => updateItemQuantity(e.currentTarget.getAttribute('data-key'), -1)));
-  DOM.cartItemsContainer.querySelectorAll('.btn-increase').forEach(btn => btn.addEventListener('click', (e) => updateItemQuantity(e.currentTarget.getAttribute('data-key'), 1)));
-
-  DOM.cartSubtotalPrice.textContent = currencyFormatter.format(subtotal);
-  DOM.btnProceedCheckout.disabled = false;
-}
+// =============================================================================
+// 7. CU: CHECKOUT DE PAGO (BOOTSTRAP 5 MODAL CON DETECCIÓN DE TARJETA)
+// =============================================================================
 
 function openCheckoutModal() {
   closeCartSidebar();
   const total = AppState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   DOM.checkoutTotalSpan.textContent = currencyFormatter.format(total);
+  
+  // Limpiar estados de error previos
   Object.values(DOM.checkoutInputs).forEach(input => input.classList.remove('input-error'));
-  if (typeof DOM.checkoutModal.showModal === 'function') { DOM.checkoutModal.showModal(); } else { DOM.checkoutModal.setAttribute('open', 'true'); }
-  document.body.classList.add('modal-open');
+  [DOM.cardNumber, DOM.cardExpiry, DOM.cardCvv, DOM.cardHolder].forEach(i => i.classList.remove('input-error'));
+
+  if (AppState.bsCheckoutModal) {
+    AppState.bsCheckoutModal.show();
+  }
 }
 
 function closeCheckoutModal() {
-  if (typeof DOM.checkoutModal.close === 'function') { DOM.checkoutModal.close(); } else { DOM.checkoutModal.removeAttribute('open'); }
-  document.body.classList.remove('modal-open');
+  if (AppState.bsCheckoutModal) {
+    AppState.bsCheckoutModal.hide();
+  }
+}
+
+/**
+ * MICROINTERACCIÓN 11: Detección Dinámica de Franquicia de Tarjeta (Visa/Mastercard/Amex)
+ * Qué hace: A medida que el cliente digita los primeros números, evalúa el prefijo BIN
+ * y actualiza instantáneamente el badge visual con el logotipo y nombre de la franquicia.
+ */
+function detectCardBrand(number) {
+  const clean = number.replace(/\D/g, '');
+  if (!DOM.cardBrandBadge) return;
+
+  if (/^4/.test(clean)) {
+    DOM.cardBrandBadge.className = 'badge bg-primary text-white';
+    DOM.cardBrandBadge.innerHTML = '<i class="bi bi-credit-card-2-front-fill me-1"></i> VISA';
+  } else if (/^(5[1-5]|2[2-7])/.test(clean)) {
+    DOM.cardBrandBadge.className = 'badge bg-warning text-dark';
+    DOM.cardBrandBadge.innerHTML = '<i class="bi bi-credit-card-fill me-1"></i> Mastercard';
+  } else if (/^3[47]/.test(clean)) {
+    DOM.cardBrandBadge.className = 'badge bg-info text-dark';
+    DOM.cardBrandBadge.innerHTML = '<i class="bi bi-credit-card-2-back me-1"></i> American Express';
+  } else {
+    DOM.cardBrandBadge.className = 'badge bg-secondary';
+    DOM.cardBrandBadge.innerHTML = '<i class="bi bi-credit-card me-1"></i> Tarjeta';
+  }
 }
 
 function initPaymentToggle() {
   const toggle = (isCash) => {
     if (isCash) {
-      DOM.cardFields.classList.add('hidden');
-      DOM.cashNote.classList.remove('hidden');
+      DOM.cardFields.classList.add('d-none');
+      DOM.cashNote.classList.remove('d-none');
+      DOM.payCashLabel.classList.add('active');
+      DOM.payCardLabel.classList.remove('active');
     } else {
-      DOM.cardFields.classList.remove('hidden');
-      DOM.cashNote.classList.add('hidden');
+      DOM.cardFields.classList.remove('d-none');
+      DOM.cashNote.classList.add('d-none');
+      DOM.payCashLabel.classList.remove('active');
+      DOM.payCardLabel.classList.add('active');
     }
   };
 
   DOM.payCashRadio.addEventListener('change', () => toggle(true));
   DOM.payCardRadio.addEventListener('change', () => toggle(false));
+  DOM.payCashLabel.addEventListener('click', () => { DOM.payCashRadio.checked = true; toggle(true); });
+  DOM.payCardLabel.addEventListener('click', () => { DOM.payCardRadio.checked = true; toggle(false); });
 
-  // Formateo automático de número de tarjeta (grupos de 4)
+  // MICROINTERACCIÓN: Formateo automático de número de tarjeta en bloques de 4 dígitos
   DOM.cardNumber.addEventListener('input', (e) => {
     let val = e.target.value.replace(/\D/g, '').substring(0, 16);
     val = val.replace(/(.{4})/g, '$1 ').trim();
     e.target.value = val;
+    detectCardBrand(val);
   });
 
-  // Formateo MM/AA para vencimiento
+  // MICROINTERACCIÓN: Formateo automático de fecha de vencimiento MM/AA
   DOM.cardExpiry.addEventListener('input', (e) => {
     let val = e.target.value.replace(/\D/g, '').substring(0, 4);
     if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2);
@@ -430,10 +811,70 @@ function initPaymentToggle() {
     e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
   });
 
-  // Nombre en tarjeta en mayúsculas
+  // Nombre del tarjetahabiente en mayúsculas
   DOM.cardHolder.addEventListener('input', (e) => {
     e.target.value = e.target.value.toUpperCase();
   });
+}
+
+/**
+ * MICROINTERACCIÓN 12: Celebración con Confeti para Pedido Exitoso
+ * Qué hace: Lanza partículas de confeti dorado y blanco sobre el modal al confirmar el pago.
+ */
+function launchCelebrationConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.className = 'confetti-canvas';
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const colors = ['#d4af37', '#ffffff', '#b5952f', '#f9fafb', '#22c55e'];
+
+  for (let i = 0; i < 90; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      vx: (Math.random() - 0.5) * 14,
+      vy: (Math.random() - 0.8) * 16,
+      size: Math.random() * 8 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1
+    });
+  }
+
+  let animationFrame;
+  function updateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.35; // Gravedad
+      p.alpha -= 0.015;
+
+      if (p.alpha > 0) {
+        alive = true;
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        ctx.restore();
+      }
+    });
+
+    if (alive) {
+      animationFrame = requestAnimationFrame(updateConfetti);
+    } else {
+      cancelAnimationFrame(animationFrame);
+      canvas.remove();
+    }
+  }
+
+  updateConfetti();
 }
 
 function handleCheckoutSubmit(e) {
@@ -441,46 +882,91 @@ function handleCheckoutSubmit(e) {
   let hasError = false;
   const inputs = DOM.checkoutInputs;
 
-  // Validar campos básicos
+  // Validar campos de entrega
   [inputs.name, inputs.address, inputs.phone].forEach(field => {
-    if (!field.value.trim()) { field.classList.add('input-error'); hasError = true; } else { field.classList.remove('input-error'); }
+    if (!field.value.trim()) {
+      field.classList.add('input-error');
+      hasError = true;
+    } else {
+      field.classList.remove('input-error');
+    }
   });
 
-  // Si eligió tarjeta, validar campos de tarjeta
   const isCard = DOM.payCardRadio.checked;
   if (isCard) {
     const cardFields = [DOM.cardNumber, DOM.cardExpiry, DOM.cardCvv, DOM.cardHolder];
     cardFields.forEach(field => {
-      if (!field.value.trim()) { field.classList.add('input-error'); hasError = true; } else { field.classList.remove('input-error'); }
+      if (!field.value.trim()) {
+        field.classList.add('input-error');
+        hasError = true;
+      } else {
+        field.classList.remove('input-error');
+      }
     });
-    // Validación básica de formato de tarjeta
-    if (DOM.cardNumber.value.replace(/\s/g, '').length < 16) { DOM.cardNumber.classList.add('input-error'); hasError = true; }
-    if (DOM.cardExpiry.value.length < 5) { DOM.cardExpiry.classList.add('input-error'); hasError = true; }
-    if (DOM.cardCvv.value.length < 3) { DOM.cardCvv.classList.add('input-error'); hasError = true; }
+
+    if (DOM.cardNumber.value.replace(/\s/g, '').length < 16) {
+      DOM.cardNumber.classList.add('input-error');
+      hasError = true;
+    }
+    if (DOM.cardExpiry.value.length < 5) {
+      DOM.cardExpiry.classList.add('input-error');
+      hasError = true;
+    }
+    if (DOM.cardCvv.value.length < 3) {
+      DOM.cardCvv.classList.add('input-error');
+      hasError = true;
+    }
   }
 
-  if (hasError) return;
+  if (hasError) {
+    showToast('Campos requeridos', 'Por favor verifica los campos resaltados en rojo', 'bi-exclamation-triangle-fill text-danger');
+    return;
+  }
 
+  // MICROINTERACCIÓN: Estado de carga interactivo con spinner
   DOM.btnConfirmCheckout.disabled = true;
-  DOM.btnConfirmCheckout.textContent = isCard ? 'Procesando pago seguro...' : 'Confirmando pedido...';
+  DOM.btnConfirmCheckout.innerHTML = `
+    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    ${isCard ? 'Procesando pago seguro 256-bit...' : 'Coordinando despacho...'}
+  `;
 
   setTimeout(() => {
     AppState.cart = [];
     saveCartToStorage();
-    const orderNumber = Math.floor(100 + Math.random() * 900);
-    const payMethod = isCard ? 'Tarjeta de crédito/débito' : 'Efectivo al recibir';
+    launchCelebrationConfetti();
+
+    const orderNumber = Math.floor(1000 + Math.random() * 9000);
+    const payMethod = isCard ? 'Tarjeta Débito/Crédito' : 'Efectivo contra entrega';
+
     DOM.checkoutContent.innerHTML = `
-      <div class="checkout-success-view" style="padding: 3rem 1.5rem; text-align: center;">
-        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        <h2 style="font-family: var(--font-serif); font-size: 1.85rem; color: #ffffff; margin: 1rem 0 0.5rem 0;">Pedido Exitoso #${orderNumber}</h2>
-        <p style="color: var(--accent-color); font-size: 0.85rem; margin-bottom: 1rem; font-weight: 600; letter-spacing: 0.05em;">${payMethod.toUpperCase()}</p>
-        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">Nuestro equipo de cocina ha comenzado la preparación de tu orden. Te notificaremos cuando esté en camino.</p>
-        <button type="button" class="btn btn-primary" id="btn-close-success-checkout">Aceptar y Continuar</button>
+      <div class="checkout-success-view py-5 px-3 text-center">
+        <div class="mb-3">
+          <svg class="checkmark-svg mx-auto" width="68" height="68" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+        <h2 class="font-serif text-white fs-3 mb-2">¡Orden Confirmada #${orderNumber}!</h2>
+        <span class="badge bg-gold text-dark fw-bold mb-3 px-3 py-2 text-uppercase tracking-wide">${payMethod}</span>
+        <p class="text-muted small mx-auto col-md-10 mb-4">
+          Nuestra brigada de cocina ha comenzado la confección de tu menú. Te enviaremos una notificación cuando el despacho gourmet esté en camino.
+        </p>
+        <button type="button" class="btn btn-gold px-4 py-2 fw-semibold ripple-btn" id="btn-close-success-checkout">
+          Aceptar y Continuar
+        </button>
       </div>
     `;
-    document.getElementById('btn-close-success-checkout').addEventListener('click', () => { closeCheckoutModal(); location.reload(); });
-  }, 1500);
+
+    document.getElementById('btn-close-success-checkout').addEventListener('click', () => {
+      closeCheckoutModal();
+      location.reload();
+    });
+  }, 1400);
 }
+
+// =============================================================================
+// 8. CU: RESERVA DE MESA (LIVE PREVIEW TICKET & VALIDACIONES)
+// =============================================================================
 
 function setupReservationDateLimits() {
   const today = new Date();
@@ -490,91 +976,272 @@ function setupReservationDateLimits() {
   DOM.resInputs.date.setAttribute('min', `${year}-${month}-${day}`);
 }
 
+/**
+ * MICROINTERACCIÓN 13: Previsualización de Ticket de Reserva en Tiempo Real
+ * Qué hace: A medida que el usuario escribe su nombre, escoge fecha, hora o cantidad de comensales,
+ * el ticket interactivo se actualiza al instante con los datos ingresados.
+ */
+function updateReservationLivePreview() {
+  const { name, guests, date, time } = DOM.resInputs;
+  if (!DOM.reservationPreviewBox || !DOM.reservationPreviewText) return;
+
+  if (name.value.trim() || guests.value || date.value || time.value) {
+    DOM.reservationPreviewBox.classList.remove('d-none');
+    const guestLabel = guests.options[guests.selectedIndex]?.text || `${guests.value} personas`;
+    DOM.reservationPreviewText.innerHTML = `
+      <div class="d-flex flex-wrap gap-3">
+        <div><strong class="text-gold">Comensal:</strong> ${name.value.trim() || 'Por definir'}</div>
+        <div><strong class="text-gold">Mesa:</strong> ${guests.value ? guestLabel : 'Por definir'}</div>
+        <div><strong class="text-gold">Fecha:</strong> ${date.value || 'Por definir'}</div>
+        <div><strong class="text-gold">Hora:</strong> ${time.value || 'Por definir'}</div>
+      </div>
+    `;
+  } else {
+    DOM.reservationPreviewBox.classList.add('d-none');
+  }
+}
+
 function handleReservationSubmit(e) {
   e.preventDefault();
   let isValid = true;
   const { name, guests, date, time, notes } = DOM.resInputs;
   const { name: errName, guests: errGuests, date: errDate, time: errTime } = DOM.resErrors;
 
-  errName.textContent = ''; errGuests.textContent = ''; errDate.textContent = ''; errTime.textContent = '';
+  errName.textContent = ''; 
+  errGuests.textContent = ''; 
+  errDate.textContent = ''; 
+  errTime.textContent = '';
   [name, guests, date, time].forEach(i => i.classList.remove('input-error'));
 
-  if (!name.value.trim()) { errName.textContent = 'Requerido.'; name.classList.add('input-error'); isValid = false; }
-  if (!guests.value) { errGuests.textContent = 'Requerido.'; guests.classList.add('input-error'); isValid = false; }
+  if (!name.value.trim()) { 
+    errName.textContent = 'El nombre completo es requerido.'; 
+    name.classList.add('input-error'); 
+    isValid = false; 
+  }
+  if (!guests.value) { 
+    errGuests.textContent = 'Por favor selecciona la cantidad de personas.'; 
+    guests.classList.add('input-error'); 
+    isValid = false; 
+  }
   if (!date.value) { 
-    errDate.textContent = 'Requerido.'; date.classList.add('input-error'); isValid = false; 
+    errDate.textContent = 'Selecciona una fecha válida.'; 
+    date.classList.add('input-error'); 
+    isValid = false; 
   } else {
     const selectedDate = new Date(`${date.value}T00:00:00`);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (selectedDate < today) { errDate.textContent = 'Fecha inválida.'; date.classList.add('input-error'); isValid = false; }
+    const today = new Date(); 
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) { 
+      errDate.textContent = 'No puedes reservar en una fecha anterior a hoy.'; 
+      date.classList.add('input-error'); 
+      isValid = false; 
+    }
   }
-  if (!time.value) { errTime.textContent = 'Requerido.'; time.classList.add('input-error'); isValid = false; }
+  if (!time.value) { 
+    errTime.textContent = 'Indica la hora estimada de llegada.'; 
+    time.classList.add('input-error'); 
+    isValid = false; 
+  }
 
-  if (!isValid) return;
+  if (!isValid) {
+    showToast('Verifica la reserva', 'Completa los campos obligatorios para agendar', 'bi-exclamation-circle text-danger');
+    return;
+  }
 
-  saveReservationToStorage({ id: Date.now(), name: name.value.trim(), guests: guests.value, date: date.value, time: time.value, notes: notes.value.trim(), createdAt: new Date().toISOString() });
-  DOM.reservationForm.style.display = 'none';
-  DOM.reservationSuccessContainer.classList.remove('hidden');
-  DOM.reservationDetails.textContent = `A nombre de ${name.value.trim()}, para ${guests.value} persona(s) el ${date.value} a las ${time.value}.`;
+  // Guardar en almacenamiento local
+  saveReservationToStorage({ 
+    id: Date.now(), 
+    name: name.value.trim(), 
+    guests: guests.value, 
+    date: date.value, 
+    time: time.value, 
+    notes: notes.value.trim(), 
+    createdAt: new Date().toISOString() 
+  });
+
+  DOM.reservationForm.classList.add('d-none');
+  DOM.reservationSuccessContainer.classList.remove('d-none');
+  DOM.reservationDetails.innerHTML = `
+    Reserva confirmada a nombre de <strong class="text-white">${name.value.trim()}</strong>.<br>
+    Mesa para <strong class="text-white">${guests.value} persona(s)</strong> programada para el día 
+    <strong class="text-white">${date.value}</strong> a las <strong class="text-white">${time.value}</strong>.
+  `;
+
+  showToast('¡Mesa Agendada!', `Te esperamos el ${date.value} a las ${time.value}`, 'bi-calendar-check-fill text-gold');
 }
 
 function resetReservationForm() {
   DOM.reservationForm.reset();
-  DOM.reservationForm.style.display = 'block';
-  DOM.reservationSuccessContainer.classList.add('hidden');
+  DOM.reservationForm.classList.remove('d-none');
+  DOM.reservationSuccessContainer.classList.add('d-none');
+  if (DOM.reservationPreviewBox) DOM.reservationPreviewBox.classList.add('d-none');
 }
 
+function saveReservationToStorage(reservationData) {
+  const existing = JSON.parse(localStorage.getItem(STORAGE_KEYS.RESERVATIONS) || '[]');
+  existing.push(reservationData);
+  localStorage.setItem(STORAGE_KEYS.RESERVATIONS, JSON.stringify(existing));
+}
+
+// =============================================================================
+// 9. INICIALIZACIÓN GENERAL DE LA APLICACIÓN
+// =============================================================================
+
 function initializeApp() {
-  if (DOM.currentYearSpan) DOM.currentYearSpan.textContent = new Date().getFullYear().toString();
-  
-  initNavbarScrollEffect();
-  
-  if (DOM.menuSearchInput) {
-    DOM.menuSearchInput.addEventListener('input', (e) => { AppState.searchTerm = e.target.value; renderDishesMenu(); });
-  }
-  if (DOM.filterVegCheckbox) {
-    DOM.filterVegCheckbox.addEventListener('change', (e) => { AppState.onlyVegetarian = e.target.checked; renderDishesMenu(); });
-  }
-  if (DOM.filterGlutenCheckbox) {
-    DOM.filterGlutenCheckbox.addEventListener('change', (e) => { AppState.onlyGlutenFree = e.target.checked; renderDishesMenu(); });
-  }
-  if (DOM.sortSelect) {
-    DOM.sortSelect.addEventListener('change', (e) => { AppState.sortBy = e.target.value; renderDishesMenu(); });
+  // Año actual dinámico en el footer
+  if (DOM.currentYearSpan) {
+    DOM.currentYearSpan.textContent = new Date().getFullYear().toString();
   }
 
+  // Inicializar componentes Bootstrap 5 API
+  if (window.bootstrap) {
+    if (DOM.dishModal) {
+      AppState.bsDishModal = bootstrap.Modal.getOrCreateInstance(DOM.dishModal);
+    }
+    if (DOM.checkoutModal) {
+      AppState.bsCheckoutModal = bootstrap.Modal.getOrCreateInstance(DOM.checkoutModal);
+    }
+    if (DOM.cartSidebar) {
+      AppState.bsCartOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(DOM.cartSidebar);
+    }
+  }
+
+  // Microinteracciones globales
+  initRippleEffect();
+  initScrollTopButton();
+  initNavbarScrollEffect();
+  highlightCurrentScheduleDay();
+  initSubwindowBlurSystem();
+
+  // Búsqueda en vivo con botón interactivo de limpieza
+  if (DOM.menuSearchInput) {
+    DOM.menuSearchInput.addEventListener('input', (e) => {
+      AppState.searchTerm = e.target.value;
+      if (DOM.btnClearSearch) {
+        if (AppState.searchTerm.length > 0) {
+          DOM.btnClearSearch.classList.remove('d-none');
+        } else {
+          DOM.btnClearSearch.classList.add('d-none');
+        }
+      }
+      renderDishesMenu();
+    });
+  }
+
+  if (DOM.btnClearSearch) {
+    DOM.btnClearSearch.addEventListener('click', () => {
+      DOM.menuSearchInput.value = '';
+      AppState.searchTerm = '';
+      DOM.btnClearSearch.classList.add('d-none');
+      renderDishesMenu();
+      DOM.menuSearchInput.focus();
+    });
+  }
+
+  // Switches dietéticos
+  if (DOM.filterVegCheckbox) {
+    DOM.filterVegCheckbox.addEventListener('change', (e) => {
+      AppState.onlyVegetarian = e.target.checked;
+      renderDishesMenu();
+    });
+  }
+
+  if (DOM.filterGlutenCheckbox) {
+    DOM.filterGlutenCheckbox.addEventListener('change', (e) => {
+      AppState.onlyGlutenFree = e.target.checked;
+      renderDishesMenu();
+    });
+  }
+
+  // Selector de orden
+  if (DOM.sortSelect) {
+    DOM.sortSelect.addEventListener('change', (e) => {
+      AppState.sortBy = e.target.value;
+      renderDishesMenu();
+    });
+  }
+
+  // Chips de categoría
   DOM.filterButtons().forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      DOM.filterButtons().forEach(b => b.classList.remove("active"));
-      e.currentTarget.classList.add("active");
-      AppState.activeCategory = e.currentTarget.getAttribute("data-category");
+    btn.addEventListener('click', (e) => {
+      DOM.filterButtons().forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      AppState.activeCategory = e.currentTarget.getAttribute('data-category');
       renderDishesMenu();
     });
   });
 
+  // Botón restablecer filtros en estado vacío
+  if (DOM.btnResetFilters) {
+    DOM.btnResetFilters.addEventListener('click', () => {
+      AppState.searchTerm = '';
+      AppState.activeCategory = 'all';
+      AppState.onlyVegetarian = false;
+      AppState.onlyGlutenFree = false;
+      AppState.sortBy = 'default';
+
+      if (DOM.menuSearchInput) DOM.menuSearchInput.value = '';
+      if (DOM.btnClearSearch) DOM.btnClearSearch.classList.add('d-none');
+      if (DOM.filterVegCheckbox) DOM.filterVegCheckbox.checked = false;
+      if (DOM.filterGlutenCheckbox) DOM.filterGlutenCheckbox.checked = false;
+      if (DOM.sortSelect) DOM.sortSelect.value = 'default';
+
+      DOM.filterButtons().forEach(b => {
+        if (b.getAttribute('data-category') === 'all') b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      renderDishesMenu();
+    });
+  }
+
+  // Render inicial de la carta
   renderDishesMenu();
 
-  DOM.dishModalCloseBtn.addEventListener('click', closeDishCustomizationModal);
-  DOM.dishModalConfirmBtn.addEventListener('click', handleConfirmAddToCart);
-  DOM.dishModal.addEventListener('click', (e) => {
-    const dialogDimensions = DOM.dishModal.getBoundingClientRect();
-    if (e.clientX < dialogDimensions.left || e.clientX > dialogDimensions.right || e.clientY < dialogDimensions.top || e.clientY > dialogDimensions.bottom) { closeDishCustomizationModal(); }
+  // Listeners del modal de personalización
+  if (DOM.dishModalConfirmBtn) {
+    DOM.dishModalConfirmBtn.addEventListener('click', handleConfirmAddToCart);
+  }
+
+  // Listeners del checkout
+  if (DOM.btnProceedCheckout) {
+    DOM.btnProceedCheckout.addEventListener('click', openCheckoutModal);
+  }
+  if (DOM.checkoutForm) {
+    DOM.checkoutForm.addEventListener('submit', handleCheckoutSubmit);
+  }
+  Object.values(DOM.checkoutInputs).forEach(input => {
+    if (input) input.addEventListener('input', () => input.classList.remove('input-error'));
   });
-
-  DOM.cartToggleBtn.addEventListener('click', openCartSidebar);
-  DOM.cartCloseBtn.addEventListener('click', closeCartSidebar);
-  DOM.cartOverlay.addEventListener('click', closeCartSidebar);
-  DOM.btnProceedCheckout.addEventListener('click', openCheckoutModal);
-
-  DOM.checkoutCloseBtn.addEventListener('click', closeCheckoutModal);
-  DOM.checkoutForm.addEventListener('submit', handleCheckoutSubmit);
-  Object.values(DOM.checkoutInputs).forEach(input => input.addEventListener('input', () => input.classList.remove('input-error')));
   initPaymentToggle();
 
+  // Listeners de reserva
   setupReservationDateLimits();
-  DOM.reservationForm.addEventListener('submit', handleReservationSubmit);
-  DOM.btnNewReservation.addEventListener('click', resetReservationForm);
+  if (DOM.reservationForm) {
+    DOM.reservationForm.addEventListener('submit', handleReservationSubmit);
+  }
+  if (DOM.btnNewReservation) {
+    DOM.btnNewReservation.addEventListener('click', resetReservationForm);
+  }
 
+  // Listeners para la previsualización en vivo del ticket de reserva
+  Object.values(DOM.resInputs).forEach(input => {
+    if (input) {
+      input.addEventListener('input', () => {
+        input.classList.remove('input-error');
+        updateReservationLivePreview();
+      });
+      input.addEventListener('change', updateReservationLivePreview);
+    }
+  });
+
+  // Cargar carrito previo del cliente
   loadCartFromStorage();
 }
 
-if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeApp); } else { initializeApp(); }
+// Arranque condicional al cargar el documento
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}

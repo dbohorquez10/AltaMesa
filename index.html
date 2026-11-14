@@ -1,466 +1,861 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="AltaMesa - Restaurante de alta cocina contemporánea. Experiencias gastronómicas memorables, ingredientes selectos y un ambiente sofisticado.">
   <title>AltaMesa | Restaurante Premium & Experiencia Culinaria</title>
   
-  <!-- Favicon sin Emojis -->
+  <!-- Favicon SVG Dorado -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3E%3Cpath d='M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm4-7v8h2.5v12h2.5V2h-5z'/%3E%3C/svg%3E">
 
-  <!-- Tipografías elegantes para experiencia premium -->
+  <!-- Tipografías de Alta Gama (Cinzel para títulos y Plus Jakarta Sans para lectura óptima) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Hoja de estilos pura CSS3 -->
+  <!-- 1. BOOTSTRAP 5.3.3 CSS (Framework Central de Componentes y Grid) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <!-- 2. BOOTSTRAP ICONS (Iconografía Vectorial Moderna) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- 3. HOJA DE ESTILOS PERSONALIZADA (Design System Dorado, Overrides y Microinteracciones) -->
   <link rel="stylesheet" href="styles.css">
   
-  <!-- Lógica en Vanilla JS diferida -->
+  <!-- 4. BOOTSTRAP 5.3.3 JS BUNDLE (Popper incluido para Modales, Offcanvas, Toasts y Tooltips) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
+
+  <!-- 5. LÓGICA DE APLICACIÓN CON MICROINTERACCIONES -->
   <script src="app.js" defer></script>
 </head>
-<body>
+<body class="bg-dark-primary text-light">
 
-  <!-- ==========================================
-       1. HERO BANNER Y NAVBAR (Navegación Fija)
-       ========================================== -->
-  <header class="hero-header">
-    <nav class="navbar" id="navbar" aria-label="Navegación principal">
-      <div class="nav-container">
-        <!-- Logotipo AltaMesa (Sin Emoji/SVG raro) -->
-        <a href="#" class="logo" aria-label="Inicio AltaMesa">
+  <!-- =========================================================================
+       1. HERO BANNER Y NAVBAR BOOTSTRAP 5 RESPONSIVA
+       - Microinteracciones: Scroll Glassmorphic, Hover Underline Glow, Carrito Pop
+       ========================================================================= -->
+  <header class="hero-header position-relative">
+    
+    <!-- Barra de Navegación Bootstrap 5 con Soporte Móvil Completo -->
+    <nav class="navbar navbar-expand-lg fixed-top custom-navbar" id="navbar" aria-label="Navegación principal">
+      <div class="container">
+        
+        <!-- Logotipo AltaMesa con Microinteracción de Brillo y Escala al Hover -->
+        <a href="#" class="navbar-brand logo d-flex align-items-center" aria-label="Inicio AltaMesa">
           <span class="logo-accent">ALTA</span>MESA
+          <span class="logo-dot"></span>
         </a>
 
-        <!-- Enlaces centrales con navegación ancla -->
-        <ul class="nav-links" id="nav-links">
-          <li><a href="#menu" class="nav-link">Menú</a></li>
-          <li><a href="#reservas" class="nav-link">Reservas</a></li>
-          <li><a href="#ubicacion" class="nav-link">Ubicación</a></li>
-        </ul>
+        <!-- Botón Hamburguesa para Móviles (Bootstrap Navbar Toggler con microanimación) -->
+        <button class="navbar-toggler border-0 shadow-none custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Alternar navegación">
+          <span class="toggler-icon"></span>
+        </button>
 
-        <!-- Botón de acceso al carrito interactivo (Icono SVG) -->
-        <div class="nav-actions">
-          <button type="button" class="btn-cart" id="cart-toggle-btn" aria-label="Ver carrito de compras">
-            <svg class="cart-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
-              <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            <span class="cart-text">Carrito</span>
-            <span class="cart-badge" id="cart-count">0</span>
-          </button>
+        <!-- Enlaces de Navegación Centralizados con Indicador Deslizante -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 nav-links-interactive" id="nav-links">
+            <li class="nav-item">
+              <a href="#menu" class="nav-link custom-nav-link" data-nav="menu">
+                <i class="bi bi-book-half me-1"></i>Menú
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#reservas" class="nav-link custom-nav-link" data-nav="reservas">
+                <i class="bi bi-calendar-event me-1"></i>Reservas
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#ubicacion" class="nav-link custom-nav-link" data-nav="ubicacion">
+                <i class="bi bi-geo-alt me-1"></i>Ubicación
+              </a>
+            </li>
+          </ul>
+
+          <!-- Acciones de Cabecera: Botón Interactivo de Carrito -->
+          <div class="d-flex align-items-center gap-2 nav-actions">
+            <button type="button" class="btn btn-cart-custom position-relative" id="cart-toggle-btn" data-bs-toggle="offcanvas" data-bs-target="#cart-sidebar" aria-controls="cart-sidebar" aria-label="Abrir carrito de compras">
+              <i class="bi bi-bag-check-fill cart-icon-bs"></i>
+              <span class="cart-text d-none d-sm-inline">Carrito</span>
+              <span class="badge rounded-pill bg-gold cart-badge-pulse" id="cart-count">0</span>
+            </button>
+          </div>
         </div>
+
       </div>
     </nav>
 
-    <!-- Contenido Principal del Hero Banner -->
-    <div class="hero-content">
-      <div class="hero-inner">
-        <p class="hero-tagline">EXPERIENCIA CULINARIA INOLVIDABLE</p>
-        <h1 class="hero-title">Despierta tus sentidos con sabores extraordinarios</h1>
-        <p class="hero-description">
-          Déjate cautivar por cortes premium, ingredientes frescos de origen local y una presentación que convertirá tu cena en una verdadera obra de arte.
-        </p>
-        <div class="hero-buttons">
-          <a href="#menu" class="btn btn-primary" id="hero-cta-btn">Ver Menú</a>
-          <a href="#reservas" class="btn btn-outline">Reservar Mesa</a>
+    <!-- Contenido Central del Hero Banner con Grid Bootstrap -->
+    <div class="hero-content d-flex align-items-center justify-content-center text-center">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-12 col-lg-10 col-xl-8">
+            <div class="hero-inner p-3 p-md-4">
+              
+              <!-- Tagline con microanimación de fade-in y brillo dorado -->
+              <div class="hero-badge-tagline mb-3">
+                <i class="bi bi-stars text-gold me-1"></i>
+                <span>EXPERIENCIA CULINARIA DE ALTA GAMA</span>
+                <i class="bi bi-stars text-gold ms-1"></i>
+              </div>
+
+              <h1 class="hero-title display-4 fw-bold mb-3">
+                Despierta tus sentidos con sabores extraordinarios
+              </h1>
+
+              <p class="hero-description lead mb-4">
+                Déjate cautivar por cortes premium, ingredientes frescos de origen local y una presentación que convertirá tu cena en una verdadera obra de arte gastronómica.
+              </p>
+
+              <!-- Botones de Acción Hero con Efectos de Ripple Magnético -->
+              <div class="hero-buttons d-flex flex-column flex-sm-row justify-content-center gap-3">
+                <a href="#menu" class="btn btn-gold btn-lg px-4 py-3 ripple-btn" id="hero-cta-btn">
+                  <span>Explorar Menú</span>
+                  <i class="bi bi-arrow-right ms-2 hero-arrow-icon"></i>
+                </a>
+                <a href="#reservas" class="btn btn-outline-gold btn-lg px-4 py-3 ripple-btn">
+                  <i class="bi bi-calendar2-check me-2"></i>
+                  <span>Reservar Mesa</span>
+                </a>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
   </header>
 
   <main>
-    <!-- ==========================================
-         2. CU: CONSULTAR MENÚ (Filtros y Grid)
-         ========================================== -->
-    <section id="menu" class="section menu-section" aria-labelledby="menu-heading">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-subtitle">NUESTRA CARTA</span>
-          <h2 id="menu-heading" class="section-title">Creaciones del Chef</h2>
-          <div class="section-divider"></div>
+    <!-- =========================================================================
+         DIVISOR VISUAL DE SECCIÓN: HERO -> NUESTRA CARTA
+         ========================================================================= -->
+    <div class="section-divider-ornament" aria-hidden="true">
+      <div class="divider-line"></div>
+      <div class="divider-badge">
+        <i class="bi bi-diamond-fill divider-diamond"></i>
+        <span>Nuestra Carta</span>
+        <i class="bi bi-stars divider-stars"></i>
+      </div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- =========================================================================
+         2. CU: CONSULTAR MENÚ (Filtros Avanzados, Búsqueda Live y Grid Bootstrap)
+         - Microinteracciones: Filter Chips Pop, Live Search Indicator, Card 3D Lift
+         ========================================================================= -->
+    <section id="menu" class="section py-5 menu-section" aria-labelledby="menu-heading">
+      <div class="container py-4">
+        
+        <!-- Encabezado de Sección con Línea Decorativa Dorada -->
+        <div class="section-header text-center mb-5">
+          <span class="section-subtitle text-gold text-uppercase fw-semibold tracking-wide">NUESTRA CARTA</span>
+          <h2 id="menu-heading" class="section-title text-white font-serif mt-1">Creaciones del Chef</h2>
+          <div class="section-divider mx-auto mt-2"></div>
         </div>
 
-        <!-- Barra de Búsqueda y Filtros Mejorada -->
-        <div class="menu-filters-bar" role="search" aria-label="Filtros del Menú">
+        <!-- Barra de Búsqueda y Filtros Optimizada con Bootstrap Grid y Flexbox -->
+        <div class="menu-filters-bar p-3 p-md-4 rounded-4 mb-4 shadow-lg" role="search" aria-label="Filtros del Menú">
           
-          <!-- Botones de Categorías -->
-          <div class="category-filters" id="category-filters">
-            <button type="button" class="filter-btn active" data-category="all">Todos</button>
-            <button type="button" class="filter-btn" data-category="Entradas">Entradas</button>
-            <button type="button" class="filter-btn" data-category="Fuertes">Platos Fuertes</button>
-            <button type="button" class="filter-btn" data-category="Postres">Postres</button>
-          </div>
-
-          <!-- Búsqueda y Dieta -->
-          <div class="search-and-diet">
-            <div class="search-input-wrapper">
-              <label for="menu-search-input" class="sr-only">Buscar plato en la carta</label>
-              <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input 
-                type="text" 
-                id="menu-search-input" 
-                class="input-search" 
-                placeholder="Buscar por nombre o ingrediente..." 
-                autocomplete="off"
-              >
-            </div>
-
-            <div class="filter-controls" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-              <select id="sort-select" class="form-control" style="width: auto; padding: 0.5rem 2rem 0.5rem 1rem; border-radius: var(--radius-full); background-color: var(--bg-input); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
-                <option value="default">Orden Recomendado</option>
-                <option value="price-asc">Menor a Mayor Precio</option>
-                <option value="price-desc">Mayor a Menor Precio</option>
-              </select>
-              <label class="custom-checkbox-container" for="filter-vegetarian-checkbox">
-                <input type="checkbox" id="filter-vegetarian-checkbox">
-                <span class="checkbox-custom"></span>
-                <span class="checkbox-label">Vegetariano</span>
-              </label>
-              <label class="custom-checkbox-container" for="filter-gluten-checkbox">
-                <input type="checkbox" id="filter-gluten-checkbox">
-                <span class="checkbox-custom"></span>
-                <span class="checkbox-label">Sin Gluten</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mensaje de no resultados (oculto por defecto) -->
-        <div id="no-results-msg" class="empty-state hidden" aria-live="polite">
-          <p>No se encontraron platos que coincidan con tu búsqueda.</p>
-        </div>
-
-        <!-- Contenedor general del menú inyectado por JS -->
-        <div id="menu-container" class="menu-container" aria-live="polite">
-          <!-- Tarjetas renderizadas dinámicamente mediante Vanilla JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         5. CU: SIMULAR RESERVA DE MESA
-         ========================================== -->
-    <section id="reservas" class="section reservations-section" aria-labelledby="reservas-heading">
-      <div class="container">
-        <div class="reservation-card-wrapper">
-          <div class="section-header text-center">
-            <span class="section-subtitle">EXCLUSIVIDAD</span>
-            <h2 id="reservas-heading" class="section-title">Reserva tu Experiencia</h2>
-            <div class="section-divider"></div>
-            <p class="reservation-lead">
-              Asegura tu mesa en nuestra sala principal o terraza privada. Te recomendamos reservar con anticipación.
-            </p>
-          </div>
-
-          <!-- Formulario de Reserva -->
-          <form id="reservation-form" class="reservation-form" novalidate>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="res-name">Nombre Completo *</label>
-                <input type="text" id="res-name" name="res-name" class="form-control" placeholder="Ej. Carolina Herrera" required>
-                <span class="error-msg" id="res-name-error"></span>
+          <div class="row g-3 align-items-center">
+            
+            <!-- Botones de Categorías como Chips Interactivos con Microanimación -->
+            <div class="col-12 col-xl-6">
+              <div class="category-filters d-flex flex-wrap gap-2" id="category-filters" role="group" aria-label="Categorías de platos">
+                <button type="button" class="filter-btn btn active" data-category="all">
+                  <i class="bi bi-grid-fill me-1"></i> Todos
+                </button>
+                <button type="button" class="filter-btn btn" data-category="Entradas">
+                  <i class="bi bi-egg-fried me-1"></i> Entradas
+                </button>
+                <button type="button" class="filter-btn btn" data-category="Fuertes">
+                  <i class="bi bi-fire me-1"></i> Platos Fuertes
+                </button>
+                <button type="button" class="filter-btn btn" data-category="Postres">
+                  <i class="bi bi-cake2-fill me-1"></i> Postres
+                </button>
               </div>
+            </div>
 
-              <div class="form-group">
-                <label for="res-guests">Número de Personas *</label>
-                <select id="res-guests" name="res-guests" class="form-control" required>
-                  <option value="" disabled selected>Selecciona cantidad</option>
-                  <option value="1">1 Persona (Barra del Chef)</option>
-                  <option value="2">2 Personas (Mesa Romántica)</option>
-                  <option value="4">4 Personas (Mesa Social)</option>
-                  <option value="6">6 Personas (Sala Imperial)</option>
-                  <option value="8">8+ Personas (Evento Exclusivo)</option>
+            <!-- Barra de Búsqueda con Botón Limpiar y Contador Dinámico -->
+            <div class="col-12 col-md-6 col-xl-3">
+              <div class="input-group search-input-group">
+                <span class="input-group-text bg-input border-secondary text-gold">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input 
+                  type="text" 
+                  id="menu-search-input" 
+                  class="form-control bg-input border-secondary text-light custom-search-field" 
+                  placeholder="Buscar plato o ingrediente..." 
+                  aria-label="Buscar plato en la carta"
+                  autocomplete="off"
+                >
+                <button class="btn btn-outline-secondary border-start-0 clear-search-btn d-none" type="button" id="btn-clear-search" aria-label="Limpiar búsqueda">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Selector de Ordenamiento y Filtros Dietéticos con Switches Modernos -->
+            <div class="col-12 col-md-6 col-xl-3">
+              <div class="d-flex align-items-center gap-2">
+                <label for="sort-select" class="visually-hidden">Ordenar platos</label>
+                <select id="sort-select" class="form-select custom-select-dark" aria-label="Ordenar menú">
+                  <option value="default">Recomendado</option>
+                  <option value="price-asc">Precio: Menor a Mayor</option>
+                  <option value="price-desc">Precio: Mayor a Menor</option>
                 </select>
-                <span class="error-msg" id="res-guests-error"></span>
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="res-date">Fecha de la Reserva *</label>
-                <input type="date" id="res-date" name="res-date" class="form-control" required>
-                <span class="error-msg" id="res-date-error"></span>
-              </div>
-
-              <div class="form-group">
-                <label for="res-time">Hora Estimada *</label>
-                <input type="time" id="res-time" name="res-time" class="form-control" min="13:00" max="23:30" required>
-                <span class="error-msg" id="res-time-error"></span>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="res-notes">Peticiones Especiales o Alergias (Opcional)</label>
-              <textarea id="res-notes" name="res-notes" class="form-control textarea-control" rows="3" placeholder="Celebración de aniversario, intolerancias, ubicación preferida..."></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block" id="btn-submit-reservation">
-              Confirmar Reserva de Mesa
-            </button>
-          </form>
-
-          <!-- Contenedor de Éxito de la Reserva (Oculto inicialmente) -->
-          <div id="reservation-success-container" class="reservation-success hidden" role="alert" aria-live="assertive">
-            <div class="success-icon-badge">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-            <h2 class="success-title">Mesa Agendada Exitosamente</h2>
-            <p id="reservation-details" class="success-subtitle"></p>
-            <button type="button" class="btn btn-outline btn-sm" id="btn-new-reservation">Hacer otra reserva</button>
           </div>
+
+          <!-- Segunda Fila de Filtros: Filtros Rápidos Dietéticos (Switches Bootstrap estilizados) -->
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 mt-3 border-top border-dark-subtle">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+              <!-- Switch Vegetariano -->
+              <div class="form-check form-switch custom-switch-gold mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="filter-vegetarian-checkbox">
+                <label class="form-check-label text-light" for="filter-vegetarian-checkbox">
+                  <i class="bi bi-leaf-fill text-success me-1"></i>Vegetariano
+                </label>
+              </div>
+
+              <!-- Switch Sin Gluten -->
+              <div class="form-check form-switch custom-switch-gold mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="filter-gluten-checkbox">
+                <label class="form-check-label text-light" for="filter-gluten-checkbox">
+                  <i class="bi bi-shield-check text-warning me-1"></i>Sin Gluten
+                </label>
+              </div>
+            </div>
+
+            <!-- Contador de Resultados Live con Microanimación de Actualización -->
+            <div class="menu-counter-badge text-muted small">
+              <span id="results-count-badge" class="badge bg-dark border border-secondary text-gold">16 platos disponibles</span>
+            </div>
+          </div>
+
         </div>
+
+        <!-- Estado Vacío cuando no hay resultados de búsqueda -->
+        <div id="no-results-msg" class="empty-state text-center py-5 d-none" aria-live="polite">
+          <div class="empty-state-icon mb-3">
+            <i class="bi bi-search text-gold display-4 opacity-50"></i>
+          </div>
+          <h4 class="text-white font-serif mb-2">No se encontraron creaciones</h4>
+          <p class="text-muted mb-3">Intenta modificar los filtros o escribir un término de búsqueda diferente.</p>
+          <button type="button" class="btn btn-outline-gold btn-sm" id="btn-reset-filters">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Restablecer filtros
+          </button>
+        </div>
+
+        <!-- Contenedor del Menú renderizado dinámicamente con Bootstrap Row & Col -->
+        <div id="menu-container" class="menu-container" aria-live="polite">
+          <!-- Tarjetas renderizadas dinámicamente desde app.js con Bootstrap Cards -->
+        </div>
+
       </div>
     </section>
 
-    <!-- ==========================================
-         6. CU: VER INFORMACIÓN DEL NEGOCIO (Ubicación)
-         ========================================== -->
-    <section id="ubicacion" class="section location-section" aria-labelledby="ubicacion-heading">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-subtitle">ENCUÉNTRANOS</span>
-          <h2 id="ubicacion-heading" class="section-title">Ubicación & Contacto</h2>
-          <div class="section-divider"></div>
-        </div>
+    <!-- =========================================================================
+         DIVISOR VISUAL DE SECCIÓN: NUESTRA CARTA -> RESERVAS
+         ========================================================================= -->
+    <div class="section-divider-ornament" aria-hidden="true">
+      <div class="divider-line"></div>
+      <div class="divider-badge">
+        <i class="bi bi-calendar2-check-fill divider-diamond"></i>
+        <span>Reservaciones</span>
+        <i class="bi bi-stars divider-stars"></i>
+      </div>
+      <div class="divider-line"></div>
+    </div>
 
-        <div class="location-grid">
-          <!-- Columna Izquierda: Dirección, CTA y Google Maps iframe -->
-          <div class="location-col location-map-col">
-            <div class="location-address-box">
-              <div class="address-header">
-                <svg class="address-pin-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                <div>
-                  <h3 class="location-box-title">Nuestra Sede</h3>
-                  <address class="address-text">Cra. 39 #45-111 a 45-1, El Poblado, Medellín, Colombia</address>
+    <!-- =========================================================================
+         3. CU: SIMULAR RESERVA DE MESA (Formulario Bootstrap Validado en Tiempo Real)
+         - Microinteracciones: Live Preview Ticket, Input Shake on Error, Button Spinner
+         ========================================================================= -->
+    <section id="reservas" class="section py-5 reservations-section position-relative" aria-labelledby="reservas-heading">
+      <div class="container py-4">
+        
+        <div class="row justify-content-center">
+          <div class="col-12 col-lg-10 col-xl-9">
+            
+            <div class="reservation-card-wrapper card bg-card border-subtle shadow-xl p-4 p-md-5 rounded-4">
+              
+              <div class="section-header text-center mb-4">
+                <span class="section-subtitle text-gold text-uppercase fw-semibold tracking-wide">EXCLUSIVIDAD</span>
+                <h2 id="reservas-heading" class="section-title text-white font-serif mt-1">Reserva tu Experiencia</h2>
+                <div class="section-divider mx-auto mt-2"></div>
+                <p class="reservation-lead text-muted mt-3 col-md-10 mx-auto">
+                  Asegura tu mesa en nuestra sala principal o terraza privada. Selecciona tus comensales y coordinaremos cada detalle para una velada insuperable.
+                </p>
+              </div>
+
+              <!-- Formulario de Reserva con Clases Bootstrap y Validación Interactiva -->
+              <form id="reservation-form" class="reservation-form needs-validation" novalidate>
+                
+                <div class="row g-3 mb-3">
+                  <!-- Nombre Completo -->
+                  <div class="col-12 col-md-6">
+                    <label for="res-name" class="form-label text-light fw-medium">
+                      Nombre Completo <span class="text-gold">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-input border-secondary text-gold">
+                        <i class="bi bi-person-fill"></i>
+                      </span>
+                      <input 
+                        type="text" 
+                        id="res-name" 
+                        name="res-name" 
+                        class="form-control bg-input border-secondary text-light custom-input" 
+                        placeholder="Ej. Carolina Herrera" 
+                        required
+                      >
+                    </div>
+                    <span class="error-msg text-danger small mt-1 d-block" id="res-name-error"></span>
+                  </div>
+
+                  <!-- Número de Personas -->
+                  <div class="col-12 col-md-6">
+                    <label for="res-guests" class="form-label text-light fw-medium">
+                      Número de Personas <span class="text-gold">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-input border-secondary text-gold">
+                        <i class="bi bi-people-fill"></i>
+                      </span>
+                      <select id="res-guests" name="res-guests" class="form-select bg-input border-secondary text-light custom-select" required>
+                        <option value="" disabled selected>Selecciona cantidad</option>
+                        <option value="1">1 Persona (Barra del Chef)</option>
+                        <option value="2">2 Personas (Mesa Romántica)</option>
+                        <option value="4">4 Personas (Mesa Social)</option>
+                        <option value="6">6 Personas (Sala Imperial)</option>
+                        <option value="8">8+ Personas (Evento Exclusivo)</option>
+                      </select>
+                    </div>
+                    <span class="error-msg text-danger small mt-1 d-block" id="res-guests-error"></span>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <!-- Fecha de Reserva -->
+                  <div class="col-12 col-md-6">
+                    <label for="res-date" class="form-label text-light fw-medium">
+                      Fecha de la Reserva <span class="text-gold">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-input border-secondary text-gold">
+                        <i class="bi bi-calendar-date-fill"></i>
+                      </span>
+                      <input 
+                        type="date" 
+                        id="res-date" 
+                        name="res-date" 
+                        class="form-control bg-input border-secondary text-light custom-input" 
+                        required
+                      >
+                    </div>
+                    <span class="error-msg text-danger small mt-1 d-block" id="res-date-error"></span>
+                  </div>
+
+                  <!-- Hora Estimada -->
+                  <div class="col-12 col-md-6">
+                    <label for="res-time" class="form-label text-light fw-medium">
+                      Hora Estimada <span class="text-gold">*</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-input border-secondary text-gold">
+                        <i class="bi bi-clock-fill"></i>
+                      </span>
+                      <input 
+                        type="time" 
+                        id="res-time" 
+                        name="res-time" 
+                        class="form-control bg-input border-secondary text-light custom-input" 
+                        min="13:00" 
+                        max="23:30" 
+                        required
+                      >
+                    </div>
+                    <span class="error-msg text-danger small mt-1 d-block" id="res-time-error"></span>
+                  </div>
+                </div>
+
+                <!-- Peticiones Especiales -->
+                <div class="mb-4">
+                  <label for="res-notes" class="form-label text-light fw-medium">
+                    Peticiones Especiales, Alergias u Ocasión (Opcional)
+                  </label>
+                  <textarea 
+                    id="res-notes" 
+                    name="res-notes" 
+                    class="form-control bg-input border-secondary text-light custom-input" 
+                    rows="3" 
+                    placeholder="Celebración de aniversario, intolerancias, ubicación en terraza preferida..."
+                  ></textarea>
+                </div>
+
+                <!-- Ticket de Previsualización en Vivo de la Reserva (Microinteracción Reactiva) -->
+                <div class="reservation-live-preview mb-4 p-3 rounded-3 border border-dashed border-secondary bg-dark-secondary d-none" id="reservation-preview-box">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge bg-gold text-dark fw-bold">Previsualización de tu Reserva</span>
+                    <span class="small text-muted"><i class="bi bi-lightning-charge-fill text-gold"></i> En tiempo real</span>
+                  </div>
+                  <div class="small text-light" id="reservation-preview-text">
+                    Completa los campos para ver el resumen de tu velada.
+                  </div>
+                </div>
+
+                <!-- Botón de Envío con Estado de Carga -->
+                <button type="submit" class="btn btn-gold btn-lg w-100 py-3 fw-bold ripple-btn" id="btn-submit-reservation">
+                  <i class="bi bi-check2-circle me-2"></i>
+                  <span>Confirmar Reserva de Mesa</span>
+                </button>
+              </form>
+
+              <!-- Vista de Confirmación Exitosa con Animación de Sello Dorado -->
+              <div id="reservation-success-container" class="reservation-success text-center py-4 d-none" role="alert" aria-live="assertive">
+                <div class="success-icon-badge mb-3 mx-auto">
+                  <svg class="checkmark-svg" width="60" height="60" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                  </svg>
+                </div>
+                <h3 class="success-title text-white font-serif mb-2">¡Mesa Agendada Exitosamente!</h3>
+                <div class="reservation-ticket-slip p-3 rounded-3 bg-dark-secondary border border-gold mx-auto col-md-8 mb-4">
+                  <div class="text-gold fw-semibold mb-1"><i class="bi bi-patch-check-fill me-1"></i> TICKET VIP ALTA MESA</div>
+                  <p id="reservation-details" class="success-subtitle text-light mb-0"></p>
+                </div>
+                <div class="d-flex justify-content-center gap-3">
+                  <button type="button" class="btn btn-outline-gold btn-sm ripple-btn" id="btn-new-reservation">
+                    <i class="bi bi-plus-circle me-1"></i> Hacer otra reserva
+                  </button>
                 </div>
               </div>
-              <a href="https://maps.google.com/?q=Cra.+39+%2345-111,+Medellin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-directions">
-                CÓMO LLEGAR
-              </a>
+
             </div>
 
-            <div class="map-wrapper">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.3025219904257!2d-75.56847242407559!3d6.223788726589311!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e44282b0e9a7e8f%3A0x7d6f51cb82ff3e72!2sCra.%2039%20%2345-111%2C%20Medell%C3%ADn%2C%20El%20Poblado%2C%20Medell%C3%ADn%2C%20Antioquia!5e0!3m2!1ses!2sco!4v1700000000000!5m2!1ses!2sco" 
-                width="100%" 
-                height="320" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy" 
-                referrerpolicy="no-referrer-when-downgrade" 
-                title="Mapa de ubicación AltaMesa en Google Maps"
-              ></iframe>
-            </div>
-          </div>
-
-          <!-- Columna Derecha: Tarjetas de Horarios y Parqueadero -->
-          <div class="location-col location-info-col">
-            <div class="info-card">
-              <div class="info-card-header">
-                <svg class="info-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <h3 class="info-card-title">Horarios de Atención</h3>
-              </div>
-              <ul class="schedule-list">
-                <li><span class="schedule-day">Martes a Jueves:</span><span class="schedule-hours">1:00 PM – 10:30 PM</span></li>
-                <li><span class="schedule-day">Viernes y Sábados:</span><span class="schedule-hours">1:00 PM – 11:30 PM</span></li>
-                <li><span class="schedule-day">Domingos y Festivos:</span><span class="schedule-hours">12:30 PM – 9:00 PM</span></li>
-                <li class="schedule-closed"><span class="schedule-day">Lunes:</span><span class="schedule-hours">Cerrado por mantenimiento</span></li>
-              </ul>
-            </div>
-
-            <div class="info-card">
-              <div class="info-card-header">
-                <svg class="info-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <h3 class="info-card-title">Servicio de Parqueadero</h3>
-              </div>
-              <p class="parking-description">
-                Ofrecemos <strong>Valet Parking privado</strong> y de cortesía para todos nuestros comensales en el acceso principal.
-              </p>
-              <div class="parking-features">
-                <span class="badge">Vigilancia 24/7</span>
-                <span class="badge">Estaciones de Carga Eléctrica</span>
-                <span class="badge">Acceso para Discapacidad</span>
-              </div>
-            </div>
           </div>
         </div>
+
       </div>
     </section>
+
+    <!-- =========================================================================
+         DIVISOR VISUAL DE SECCIÓN: RESERVAS -> UBICACIÓN Y CONTACTO
+         ========================================================================= -->
+    <div class="section-divider-ornament" aria-hidden="true">
+      <div class="divider-line"></div>
+      <div class="divider-badge">
+        <i class="bi bi-geo-alt-fill divider-diamond"></i>
+        <span>Ubicación & Contacto</span>
+        <i class="bi bi-stars divider-stars"></i>
+      </div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- =========================================================================
+         4. CU: VER INFORMACIÓN DEL NEGOCIO / UBICACIÓN Y CONTACTO
+         - Microinteracciones: Card Hover Lift, Interactive Schedule Highlight
+         ========================================================================= -->
+    <section id="ubicacion" class="section py-5 location-section" aria-labelledby="ubicacion-heading">
+      <div class="container py-4">
+        
+        <div class="section-header text-center mb-5">
+          <span class="section-subtitle text-gold text-uppercase fw-semibold tracking-wide">ENCUÉNTRANOS</span>
+          <h2 id="ubicacion-heading" class="section-title text-white font-serif mt-1">Ubicación & Contacto</h2>
+          <div class="section-divider mx-auto mt-2"></div>
+        </div>
+
+        <div class="row g-4">
+          
+          <!-- Columna Izquierda: Dirección, CTA y Google Maps Responsive -->
+          <div class="col-12 col-lg-7">
+            <div class="card bg-card border-subtle h-100 rounded-4 overflow-hidden shadow-lg location-main-card">
+              
+              <div class="card-body p-4 p-md-4">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="location-icon-wrapper rounded-circle bg-gold-subtle p-3 text-gold">
+                      <i class="bi bi-geo-alt-fill fs-4"></i>
+                    </div>
+                    <div>
+                      <h4 class="location-box-title text-white font-serif mb-1">Nuestra Sede Principal</h4>
+                      <address class="address-text text-muted mb-0">Cra. 39 #45-111 a 45-1, El Poblado, Medellín, Colombia</address>
+                    </div>
+                  </div>
+                  <a href="https://maps.google.com/?q=Cra.+39+%2345-111,+Medellin" target="_blank" rel="noopener noreferrer" class="btn btn-outline-gold btn-sm ripple-btn flex-shrink-0">
+                    <i class="bi bi-cursor-fill me-1"></i> Cómo llegar
+                  </a>
+                </div>
+
+                <!-- Google Maps iframe responsivo mediante Bootstrap ratio -->
+                <div class="ratio ratio-16x9 rounded-3 overflow-hidden border border-secondary shadow-sm">
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.3025219904257!2d-75.56847242407559!3d6.223788726589311!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e44282b0e9a7e8f%3A0x7d6f51cb82ff3e72!2sCra.%2039%20%2345-111%2C%20Medell%C3%ADn%2C%20El%20Poblado%2C%20Medell%C3%ADn%2C%20Antioquia!5e0!3m2!1ses!2sco!4v1700000000000!5m2!1ses!2sco" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade" 
+                    title="Mapa de ubicación AltaMesa en Google Maps"
+                  ></iframe>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Tarjetas de Horarios y Valet Parking -->
+          <div class="col-12 col-lg-5">
+            <div class="d-flex flex-column gap-4 h-100">
+              
+              <!-- Tarjeta de Horarios con Detección del Día Actual (Microinteracción de estado abierto/cerrado) -->
+              <div class="card bg-card border-subtle rounded-4 p-4 shadow-lg info-card-interactive" id="schedule-card">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-gold fs-4"></i>
+                    <h4 class="info-card-title text-white font-serif mb-0">Horarios de Atención</h4>
+                  </div>
+                  <!-- Indicador de Abierto Ahora -->
+                  <span class="badge rounded-pill bg-success-subtle text-success border border-success px-2 py-1 small" id="business-status-badge">
+                    <span class="status-pulse-dot"></span> Abierto Hoy
+                  </span>
+                </div>
+                
+                <ul class="schedule-list list-unstyled mb-0">
+                  <li class="d-flex justify-content-between py-2 border-bottom border-dark-subtle" data-days="2,3,4">
+                    <span class="text-light fw-medium">Martes a Jueves:</span>
+                    <span class="text-gold">1:00 PM – 10:30 PM</span>
+                  </li>
+                  <li class="d-flex justify-content-between py-2 border-bottom border-dark-subtle" data-days="5,6">
+                    <span class="text-light fw-medium">Viernes y Sábados:</span>
+                    <span class="text-gold">1:00 PM – 11:30 PM</span>
+                  </li>
+                  <li class="d-flex justify-content-between py-2 border-bottom border-dark-subtle" data-days="0">
+                    <span class="text-light fw-medium">Domingos y Festivos:</span>
+                    <span class="text-gold">12:30 PM – 9:00 PM</span>
+                  </li>
+                  <li class="d-flex justify-content-between py-2 schedule-closed opacity-75" data-days="1">
+                    <span class="text-muted">Lunes:</span>
+                    <span class="text-danger small fw-semibold">Cerrado por mantenimiento</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Tarjeta de Parqueadero y Servicios VIP -->
+              <div class="card bg-card border-subtle rounded-4 p-4 shadow-lg info-card-interactive flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <i class="bi bi-shield-shaded text-gold fs-4"></i>
+                  <h4 class="info-card-title text-white font-serif mb-0">Servicio de Parqueadero</h4>
+                </div>
+                <p class="parking-description text-muted mb-3">
+                  Ofrecemos <strong class="text-white">Valet Parking privado</strong> y de cortesía para todos nuestros comensales en el acceso principal sobre la Cra. 39.
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-auto">
+                  <span class="badge bg-dark border border-secondary text-light px-3 py-2 rounded-pill">
+                    <i class="bi bi-camera-video text-gold me-1"></i> Vigilancia 24/7
+                  </span>
+                  <span class="badge bg-dark border border-secondary text-light px-3 py-2 rounded-pill">
+                    <i class="bi bi-ev-station text-gold me-1"></i> Carga Eléctrica
+                  </span>
+                  <span class="badge bg-dark border border-secondary text-light px-3 py-2 rounded-pill">
+                    <i class="bi bi-person-wheelchair text-gold me-1"></i> Accesibilidad
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         DIVISOR VISUAL DE SECCIÓN: UBICACIÓN -> FOOTER
+         ========================================================================= -->
+    <div class="section-divider-ornament divider-to-footer mb-0" aria-hidden="true">
+      <div class="divider-line"></div>
+      <div class="divider-badge">
+        <i class="bi bi-award-fill divider-diamond"></i>
+        <span>AltaMesa Experience</span>
+        <i class="bi bi-stars divider-stars"></i>
+      </div>
+      <div class="divider-line"></div>
+    </div>
   </main>
 
-  <!-- ==========================================
-       FOOTER
-       ========================================== -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-brand">
-        <a href="#" class="logo">
-          <span class="logo-accent">ALTA</span>MESA
-        </a>
-        <p class="footer-text">Gastronomía contemporánea inspirada en el origen y la pasión culinaria.</p>
-      </div>
-      <div class="footer-copy">
-        <p>&copy; <span id="current-year">2026</span> AltaMesa Restaurant. Todos los derechos reservados.</p>
+  <!-- =========================================================================
+       FOOTER ELEGANTE CON BOOTSTRAP GRID
+       ========================================================================= -->
+  <footer class="footer bg-dark-secondary border-top border-secondary py-5">
+    <div class="container">
+      <div class="row align-items-center gy-4">
+        <div class="col-12 col-md-6 text-center text-md-start">
+          <a href="#" class="logo d-inline-block mb-2">
+            <span class="logo-accent">ALTA</span>MESA
+          </a>
+          <p class="text-muted small mb-0">Gastronomía contemporánea inspirada en el origen y la pasión culinaria.</p>
+        </div>
+        <div class="col-12 col-md-6 text-center text-md-end">
+          <div class="social-links mb-2 d-flex justify-content-center justify-content-md-end gap-3">
+            <a href="#" class="text-gold social-icon" aria-label="Instagram"><i class="bi bi-instagram fs-5"></i></a>
+            <a href="#" class="text-gold social-icon" aria-label="Facebook"><i class="bi bi-facebook fs-5"></i></a>
+            <a href="#" class="text-gold social-icon" aria-label="Tripadvisor"><i class="bi bi-award fs-5"></i></a>
+          </div>
+          <p class="text-muted small mb-0">&copy; <span id="current-year">2026</span> AltaMesa Restaurant. Todos los derechos reservados.</p>
+        </div>
       </div>
     </div>
   </footer>
 
-  <!-- ==========================================
-       3. CU: GESTIONAR CARRITO (Sidebar & Overlay)
-       ========================================== -->
-  <div id="cart-overlay" class="cart-overlay" aria-hidden="true"></div>
-
-  <aside id="cart-sidebar" class="cart-sidebar" aria-labelledby="cart-sidebar-title" aria-hidden="true" role="dialog">
-    <div class="cart-sidebar-header">
-      <div class="cart-title-wrapper">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-        <h2 id="cart-sidebar-title" class="cart-sidebar-title">Tu Pedido</h2>
+  <!-- =========================================================================
+       5. CU: GESTIONAR CARRITO CON BOOTSTRAP 5 OFFCANVAS
+       - Microinteracciones: Barra de Progreso a Beneficio Gourmet, Increment Bounce,
+         Slide-out en eliminación, Subtotal Flash
+       ========================================================================= -->
+  <aside 
+    class="offcanvas offcanvas-end bg-card text-light custom-offcanvas-cart" 
+    tabindex="-1" 
+    id="cart-sidebar" 
+    aria-labelledby="cart-sidebar-title"
+  >
+    <!-- Cabecera del Offcanvas -->
+    <div class="offcanvas-header border-bottom border-dark-subtle p-3 p-md-4">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-bag-heart-fill text-gold fs-4"></i>
+        <h3 class="offcanvas-title font-serif text-white fs-5 mb-0" id="cart-sidebar-title">Tu Pedido</h3>
       </div>
-      <button type="button" class="btn-close" id="cart-close-btn" aria-label="Cerrar carrito">&times;</button>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito" id="cart-close-btn"></button>
     </div>
 
-    <div class="cart-items-container" id="cart-items-container" tabindex="0">
-      <!-- Inyectado dinámicamente desde app.js -->
+    <!-- Barra de Meta VIP de Envío / Obsequio Gourmet (Microinteracción de Recompensa) -->
+    <div class="cart-reward-banner p-3 bg-dark-secondary border-bottom border-dark-subtle">
+      <div class="d-flex justify-content-between align-items-center small mb-1">
+        <span class="text-light" id="cart-reward-text">
+          <i class="bi bi-gift-fill text-gold me-1"></i> Beneficio VIP de Cortesía
+        </span>
+        <span class="text-gold fw-bold" id="cart-reward-status">$ 120.000</span>
+      </div>
+      <div class="progress custom-reward-progress" style="height: 6px;">
+        <div class="progress-bar bg-gold progress-bar-striped progress-bar-animated" role="progressbar" id="cart-reward-progress-bar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
     </div>
 
-    <div class="cart-sidebar-footer">
-      <div class="cart-summary-row">
-        <span class="summary-label">Subtotal</span>
-        <span class="summary-value" id="cart-subtotal-price">$ 0</span>
+    <!-- Contenedor con Scroll de Items del Carrito -->
+    <div class="offcanvas-body p-3 p-md-4 cart-items-container" id="cart-items-container" tabindex="0">
+      <!-- Inyectado dinámicamente con animación desde app.js -->
+    </div>
+
+    <!-- Pie del Offcanvas con Subtotal y CTA de Checkout -->
+    <div class="offcanvas-footer border-top border-dark-subtle p-3 p-md-4 bg-dark-secondary">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-muted">Subtotal</span>
+        <span class="text-white fs-4 fw-bold font-serif" id="cart-subtotal-price">$ 0</span>
       </div>
-      <p class="cart-tax-notice">Impuestos y propina sugerida calculados al finalizar.</p>
-      <button type="button" class="btn btn-primary btn-block" id="btn-proceed-checkout" disabled>
-        Proceder al Pago
+      <p class="text-muted small mb-3">
+        <i class="bi bi-info-circle text-gold me-1"></i> Impuestos y propina sugerida calculados al finalizar.
+      </p>
+      <button type="button" class="btn btn-gold btn-lg w-100 py-3 fw-bold ripple-btn" id="btn-proceed-checkout" disabled>
+        <span>Proceder al Pago</span>
+        <i class="bi bi-credit-card-2-front ms-2"></i>
       </button>
     </div>
   </aside>
 
-  <!-- ==========================================
-       MODAL DE PERSONALIZACIÓN DE PLATO (<dialog>)
-       ========================================== -->
-  <dialog id="dish-customization-dialog" class="modal-dialog dish-modal">
-    <div class="dialog-content">
-      <div class="dialog-header">
-        <h3 id="modal-dish-title" class="dialog-title">Personalizar Plato</h3>
-        <button type="button" class="btn-close-dialog" id="btn-close-dish-modal" aria-label="Cerrar modal">&times;</button>
-      </div>
+  <!-- Overlay de respaldo para compatibilidad de clics fuera si es requerido -->
+  <div id="cart-overlay" class="cart-overlay-bs d-none" aria-hidden="true"></div>
 
-      <div class="dialog-body">
-        <p id="modal-dish-desc" class="modal-dish-description"></p>
-        <p class="customization-subtitle">Indica tus preferencias o exclusiones:</p>
+  <!-- =========================================================================
+       6. MODAL DE PERSONALIZACIÓN DE PLATO (BOOTSTRAP 5 MODAL)
+       - Microinteracciones: Checkbox Spring Bounce, Highlight de Opciones, Live Price Tag
+       ========================================================================= -->
+  <div class="modal fade custom-modal-gold" id="dish-customization-dialog" tabindex="-1" aria-labelledby="modal-dish-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-card border-subtle shadow-2xl rounded-4">
+        
+        <div class="modal-header border-bottom border-dark-subtle p-3 p-md-4">
+          <h4 class="modal-title font-serif text-white fs-5" id="modal-dish-title">Personalizar Creación</h4>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar modal" id="btn-close-dish-modal"></button>
+        </div>
 
-        <div class="exclusion-options-list" id="modal-exclusions-list"></div>
-      </div>
-
-      <div class="dialog-footer">
-        <div class="modal-price-tag" id="modal-dish-price">$ 0</div>
-        <button type="button" class="btn btn-primary" id="btn-confirm-add-cart">
-          Agregar al Carrito
-        </button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- ==========================================
-       4. CU: SIMULAR CHECKOUT DE PAGO (Modal)
-       ========================================== -->
-  <dialog id="checkout-modal" class="modal-dialog checkout-modal">
-    <div class="dialog-content checkout-content" id="checkout-dialog-content">
-      <div class="dialog-header">
-        <h3 class="dialog-title">Finalizar Pedido</h3>
-        <button type="button" class="btn-close-dialog" id="btn-close-checkout-modal" aria-label="Cerrar modal de pago">&times;</button>
-      </div>
-
-      <div class="dialog-body">
-        <p class="checkout-instruction">Ingresa los datos para coordinar la entrega o despacho express.</p>
-
-        <form id="checkout-form" class="checkout-form" novalidate>
-          <div class="form-group">
-            <label for="checkout-name">Nombre Completo *</label>
-            <input type="text" id="checkout-name" name="checkout-name" class="form-control" placeholder="Ej. Mateo Gómez" required>
+        <div class="modal-body p-3 p-md-4">
+          <p id="modal-dish-desc" class="text-muted mb-3"></p>
+          
+          <div class="p-3 bg-dark-secondary rounded-3 border border-dark-subtle mb-3">
+            <h6 class="text-gold text-uppercase fw-semibold small tracking-wide mb-2">
+              <i class="bi bi-sliders me-1"></i> Preferencias o exclusiones culinarias:
+            </h6>
+            <!-- Lista de Exclusiones renderizadas con Checkboxes Interactivos -->
+            <div class="exclusion-options-list d-flex flex-column gap-2" id="modal-exclusions-list"></div>
           </div>
-          <div class="form-group">
-            <label for="checkout-address">Dirección de Entrega *</label>
-            <input type="text" id="checkout-address" name="checkout-address" class="form-control" placeholder="Ej. Calle 10 # 32-45 Apto 502" required>
-          </div>
-          <div class="form-group">
-            <label for="checkout-phone">Teléfono de Contacto *</label>
-            <input type="tel" id="checkout-phone" name="checkout-phone" class="form-control" placeholder="Ej. 310 987 6543" required>
-          </div>
-          <!-- Selector de Método de Pago -->
-          <div class="form-group">
-            <label>Método de Pago *</label>
-            <div class="payment-method-toggle">
-              <label class="payment-option" id="pay-cash-label">
-                <input type="radio" name="payment-method" id="pay-cash" value="efectivo" checked>
-                <span class="payment-option-inner">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                  Efectivo
-                </span>
-              </label>
-              <label class="payment-option" id="pay-card-label">
-                <input type="radio" name="payment-method" id="pay-card" value="tarjeta">
-                <span class="payment-option-inner">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                  Tarjeta
-                </span>
-              </label>
-            </div>
-          </div>
+        </div>
 
-          <!-- Campos de Tarjeta (ocultos por defecto, se muestran solo si elige Tarjeta) -->
-          <div id="card-fields" class="card-fields hidden">
-            <div class="form-group">
-              <label for="checkout-card-number">Número de Tarjeta *</label>
-              <input type="text" id="checkout-card-number" name="checkout-card-number" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number">
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="checkout-card-expiry">Vencimiento *</label>
-                <input type="text" id="checkout-card-expiry" name="checkout-card-expiry" class="form-control" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
-              </div>
-              <div class="form-group">
-                <label for="checkout-card-cvv">CVV *</label>
-                <input type="text" id="checkout-card-cvv" name="checkout-card-cvv" class="form-control" placeholder="123" maxlength="4" autocomplete="cc-csc">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="checkout-card-holder">Nombre en la Tarjeta *</label>
-              <input type="text" id="checkout-card-holder" name="checkout-card-holder" class="form-control" placeholder="Ej. JUAN CARLOS GARCIA" autocomplete="cc-name" style="text-transform: uppercase;">
-            </div>
+        <div class="modal-footer border-top border-dark-subtle p-3 p-md-4 justify-content-between">
+          <div>
+            <span class="small text-muted d-block">Precio unitario:</span>
+            <span class="fs-4 fw-bold font-serif text-gold" id="modal-dish-price">$ 0</span>
           </div>
-
-          <!-- Nota de Efectivo (visible por defecto) -->
-          <div id="cash-note" class="cash-note">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <span>Ten el dinero exacto listo. Nuestro mensajero no maneja cambios superiores a $50.000 COP.</span>
-          </div>
-
-          <div class="checkout-total-summary">
-            <span>Total a Pagar:</span>
-            <strong id="checkout-modal-total">$ 0</strong>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block" id="btn-confirm-checkout">
-            Confirmar y Pagar
+          <button type="button" class="btn btn-gold px-4 py-2 fw-semibold ripple-btn" id="btn-confirm-add-cart">
+            <i class="bi bi-bag-plus-fill me-1"></i> Agregar al Pedido
           </button>
-        </form>
+        </div>
+
       </div>
     </div>
-  </dialog>
+  </div>
+
+  <!-- =========================================================================
+       7. CU: SIMULAR CHECKOUT DE PAGO (BOOTSTRAP 5 MODAL)
+       - Microinteracciones: Formateo de Tarjeta en Vivo, Detección de Franquicia,
+         Toggle Animado Efectivo/Tarjeta, Confetti de Éxito
+       ========================================================================= -->
+  <div class="modal fade custom-modal-gold" id="checkout-modal" tabindex="-1" aria-labelledby="checkout-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-card border-subtle shadow-2xl rounded-4" id="checkout-dialog-content">
+        
+        <div class="modal-header border-bottom border-dark-subtle p-3 p-md-4">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-lock-fill text-gold fs-4"></i>
+            <h4 class="modal-title font-serif text-white fs-5" id="checkout-modal-title">Finalizar Pedido & Despacho</h4>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar modal" id="btn-close-checkout-modal"></button>
+        </div>
+
+        <div class="modal-body p-3 p-md-4">
+          <p class="text-muted small mb-4">
+            Ingresa tus datos para la entrega gourmet. Todos los datos están protegidos con encriptación de 256 bits.
+          </p>
+
+          <form id="checkout-form" class="checkout-form needs-validation" novalidate>
+            
+            <div class="row g-3 mb-3">
+              <!-- Nombre -->
+              <div class="col-12 col-md-6">
+                <label for="checkout-name" class="form-label text-light fw-medium">Nombre Completo <span class="text-gold">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-input border-secondary text-gold"><i class="bi bi-person"></i></span>
+                  <input type="text" id="checkout-name" name="checkout-name" class="form-control bg-input border-secondary text-light custom-input" placeholder="Ej. Mateo Gómez" required>
+                </div>
+              </div>
+
+              <!-- Teléfono -->
+              <div class="col-12 col-md-6">
+                <label for="checkout-phone" class="form-label text-light fw-medium">Teléfono Celular <span class="text-gold">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-input border-secondary text-gold"><i class="bi bi-telephone"></i></span>
+                  <input type="tel" id="checkout-phone" name="checkout-phone" class="form-control bg-input border-secondary text-light custom-input" placeholder="Ej. 310 987 6543" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="mb-3">
+              <label for="checkout-address" class="form-label text-light fw-medium">Dirección de Entrega <span class="text-gold">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-input border-secondary text-gold"><i class="bi bi-geo-alt"></i></span>
+                <input type="text" id="checkout-address" name="checkout-address" class="form-control bg-input border-secondary text-light custom-input" placeholder="Ej. Carrera 43A # 1Sur - 220, Apto 901" required>
+              </div>
+            </div>
+
+            <!-- Selector Interactivo de Método de Pago (Tabs con Microanimación de selección) -->
+            <div class="mb-4">
+              <label class="form-label text-light fw-medium mb-2 d-block">Método de Pago <span class="text-gold">*</span></label>
+              <div class="payment-method-toggle-bs d-flex gap-2">
+                <label class="payment-option-bs flex-fill p-3 rounded-3 border border-secondary text-center cursor-pointer active" id="pay-cash-label">
+                  <input type="radio" name="payment-method" id="pay-cash" value="efectivo" checked class="d-none">
+                  <i class="bi bi-cash-stack fs-4 d-block text-gold mb-1"></i>
+                  <span class="fw-semibold text-light">Efectivo contra entrega</span>
+                </label>
+                <label class="payment-option-bs flex-fill p-3 rounded-3 border border-secondary text-center cursor-pointer" id="pay-card-label">
+                  <input type="radio" name="payment-method" id="pay-card" value="tarjeta" class="d-none">
+                  <i class="bi bi-credit-card-2-back-fill fs-4 d-block text-gold mb-1"></i>
+                  <span class="fw-semibold text-light">Tarjeta Débito / Crédito</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Campos de Tarjeta con Validación y Detección de Franquicia en Vivo -->
+            <div id="card-fields" class="card-fields-box p-3 rounded-3 bg-dark-secondary border border-secondary mb-3 d-none">
+              
+              <!-- Número de Tarjeta e Icono de Franquicia Dinámico -->
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="checkout-card-number" class="form-label text-light small fw-medium mb-0">Número de Tarjeta *</label>
+                  <span id="card-brand-badge" class="badge bg-secondary small">
+                    <i class="bi bi-credit-card me-1"></i> Tarjeta
+                  </span>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text bg-input border-secondary text-gold"><i class="bi bi-123"></i></span>
+                  <input type="text" id="checkout-card-number" name="checkout-card-number" class="form-control bg-input border-secondary text-light custom-input" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number">
+                </div>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label for="checkout-card-expiry" class="form-label text-light small fw-medium">Vencimiento *</label>
+                  <input type="text" id="checkout-card-expiry" name="checkout-card-expiry" class="form-control bg-input border-secondary text-light custom-input" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp">
+                </div>
+                <div class="col-6">
+                  <label for="checkout-card-cvv" class="form-label text-light small fw-medium">CVV / CVC *</label>
+                  <input type="password" id="checkout-card-cvv" name="checkout-card-cvv" class="form-control bg-input border-secondary text-light custom-input" placeholder="•••" maxlength="4" autocomplete="cc-csc">
+                </div>
+              </div>
+
+              <div>
+                <label for="checkout-card-holder" class="form-label text-light small fw-medium">Nombre en la Tarjeta *</label>
+                <input type="text" id="checkout-card-holder" name="checkout-card-holder" class="form-control bg-input border-secondary text-light custom-input text-uppercase" placeholder="MATEO GOMEZ" autocomplete="cc-name">
+              </div>
+
+            </div>
+
+            <!-- Nota Informativa de Pago en Efectivo -->
+            <div id="cash-note" class="cash-note-box p-3 rounded-3 bg-dark-secondary border border-secondary mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-info-circle-fill text-gold fs-5 flex-shrink-0"></i>
+              <span class="small text-muted">
+                Por seguridad de nuestro mensajero, se reciben pagos de hasta $200.000 COP y cambio máximo para $50.000 COP.
+              </span>
+            </div>
+
+            <!-- Resumen Total -->
+            <div class="d-flex justify-content-between align-items-center p-3 rounded-3 bg-dark-secondary border border-gold mb-4">
+              <span class="text-light fw-medium">Total de la Orden:</span>
+              <span class="fs-4 fw-bold font-serif text-gold" id="checkout-modal-total">$ 0</span>
+            </div>
+
+            <!-- Botón de Confirmación y Pago -->
+            <button type="submit" class="btn btn-gold btn-lg w-100 py-3 fw-bold ripple-btn" id="btn-confirm-checkout">
+              <i class="bi bi-lock-fill me-1"></i>
+              <span id="btn-checkout-label">Confirmar y Pagar</span>
+            </button>
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       8. CONTENEDOR FLOTANTE DE NOTIFICACIONES BOOTSTRAP TOASTS
+       - Microinteracciones: Deslizamiento suave, Auto-dismiss, Iconos Temáticos
+       ========================================================================= -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" id="altamesa-toast-container" style="z-index: 1090;">
+    <!-- Los toasts se instanciarán dinámicamente con Bootstrap Toast API -->
+  </div>
+
+  <!-- =========================================================================
+       9. BOTÓN FLOTANTE "VOLVER ARRIBA" (Microinteracción Scroll-Driven)
+       ========================================================================= -->
+  <button type="button" class="btn-scroll-top btn rounded-circle shadow-lg d-flex align-items-center justify-content-center" id="btn-scroll-top" aria-label="Volver arriba">
+    <i class="bi bi-arrow-up-short fs-4"></i>
+  </button>
 
 </body>
 </html>
-
